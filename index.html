@@ -85,10 +85,23 @@
     box-shadow:0 10px 40px rgba(0,0,0,.4);
   }
   label{display:block;text-align:left;margin:18px 0 8px;font-size:14px;letter-spacing:.08em;color:var(--gold-soft)}
-  input[type=date]{
+  input[type=date],input[type=time],select{
     width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(231,200,115,.4);
     background:rgba(10,10,31,.6);color:var(--text);font-size:16px;font-family:inherit;
   }
+  select{appearance:none;-webkit-appearance:none;cursor:pointer;
+    background-image:linear-gradient(45deg,transparent 50%,var(--gold-soft) 50%),linear-gradient(135deg,var(--gold-soft) 50%,transparent 50%);
+    background-position:calc(100% - 18px) 19px,calc(100% - 12px) 19px;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:34px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .opt{font-size:11px;color:#9c97c0;letter-spacing:0}
+  button.auto{
+    margin-top:18px;width:100%;padding:13px;border-radius:12px;cursor:pointer;font-family:inherit;
+    font-size:14px;letter-spacing:.08em;color:var(--gold-soft);
+    background:rgba(231,200,115,.1);border:1px dashed rgba(231,200,115,.55);transition:all .2s;
+  }
+  button.auto:hover{background:rgba(231,200,115,.2)}
+  .auto-result{font-size:13px;color:var(--gold-soft);margin-top:10px;min-height:0;text-align:center;letter-spacing:.03em}
+  .auto-result.on{margin:12px 0 4px}
   .phase-grid{
     display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px;
   }
@@ -152,6 +165,24 @@
   .again:hover{background:rgba(231,200,115,.12)}
   .note{font-size:11px;opacity:.5;margin-top:26px;letter-spacing:.05em;line-height:1.8}
 
+  /* ===== LINE宣伝(PR)ブロック ===== */
+  .promo{
+    margin-top:24px;padding:20px 18px;border-radius:16px;text-align:center;
+    background:linear-gradient(180deg,rgba(6,199,85,.16),rgba(6,199,85,.06));
+    border:1px solid rgba(6,199,85,.5);
+  }
+  .promo .pt{font-size:15px;letter-spacing:.04em;line-height:1.7;color:#eafff0}
+  .promo .ps{font-size:12px;color:#bfe9cc;margin-top:6px;line-height:1.7}
+  .line-btn{
+    display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+    padding:13px 26px;border-radius:999px;text-decoration:none;
+    background:#06c755;color:#fff;font-weight:700;font-size:15px;letter-spacing:.05em;
+    box-shadow:0 6px 20px rgba(6,199,85,.45);transition:transform .2s,filter .2s;
+  }
+  .line-btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+  .line-ico{width:22px;height:22px;background:#fff;border-radius:6px;color:#06c755;
+    display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-family:Arial,sans-serif}
+
   /* ===== スマホ最適化 ===== */
   @media (max-width:480px){
     .wrap{padding:34px 14px 64px}
@@ -195,7 +226,21 @@
     <label for="bday">生まれた日（生年月日）</label>
     <input type="date" id="bday" min="1900-01-01" max="2099-12-31" value="2000-01-01">
 
-    <label>生まれたときの月の形</label>
+    <div class="row2">
+      <div>
+        <label for="btime">生まれた時間 <span class="opt">（任意）</span></label>
+        <input type="time" id="btime" value="12:00">
+      </div>
+      <div>
+        <label for="bplace">生まれた場所</label>
+        <select id="bplace"></select>
+      </div>
+    </div>
+
+    <button class="auto" id="autoBtn" type="button">🌙 生まれた時の月の形を自動で調べる</button>
+    <div class="auto-result" id="autoResult"></div>
+
+    <label>生まれたときの月の形 <span class="opt">（自動判定 または 手動で選択）</span></label>
     <div class="phase-grid" id="phaseGrid"></div>
 
     <button class="cast" id="castBtn" disabled>月に問う</button>
@@ -205,7 +250,8 @@
 
   <div class="note">
     マドモアゼル愛先生の「月星座」の考え方を参考にした、エンターテインメント占いです。<br>
-    月星座は生年月日から概算で算出しています（時刻により境界はずれることがあります）。
+    月星座・月の満ち欠けは、生まれた日・時間・場所から概算で算出しています<br>
+    （時間が不明な場合はお昼として計算します。境界の前後では多少ずれることがあります）。
   </div>
 </div>
 
@@ -216,6 +262,30 @@
 </div>
 
 <script>
+/* ============================================================
+   ▼▼▼ マドモアゼル愛先生 LINE のURL（ここを差し替えてください）▼▼▼
+   LINE公式アカウントの「友だち追加」URL（例: https://lin.ee/xxxxxxx）に変更すると
+   結果画面の緑のボタンがそのアカウントにつながります。
+   ============================================================ */
+const LINE_URL = "https://lin.ee/your-line-id"; // ←ここを本物のURLに差し替え
+const LINE_NAME = "マドモアゼル愛先生";
+
+/* ========== 生まれた場所（タイムゾーン）========== */
+/* 月の満ち欠けは「生まれた日時」で決まり、場所は時差(UTCとのズレ)の補正に使います */
+const PLACES=[
+  {n:'日本（東京・大阪など）',tz:9},
+  {n:'韓国（ソウル）',tz:9},
+  {n:'台湾（台北）',tz:8},
+  {n:'中国（北京・上海）',tz:8},
+  {n:'タイ（バンコク）',tz:7},
+  {n:'ハワイ（ホノルル）',tz:-10},
+  {n:'アメリカ西海岸（ロサンゼルス）',tz:-8},
+  {n:'アメリカ東海岸（ニューヨーク）',tz:-5},
+  {n:'イギリス（ロンドン）',tz:0},
+  {n:'フランス・ドイツ（パリ・ベルリン）',tz:1},
+  {n:'オーストラリア東部（シドニー）',tz:10},
+];
+
 /* ========== 星空生成 ========== */
 function makeStars(id,count){
   const c=document.getElementById(id);
@@ -278,60 +348,101 @@ function selectPhase(idx,el){
 }
 
 const bday=document.getElementById('bday');
+const btime=document.getElementById('btime');
+const bplace=document.getElementById('bplace');
 const castBtn=document.getElementById('castBtn');
+const autoBtn=document.getElementById('autoBtn');
+const autoResult=document.getElementById('autoResult');
+
+// 場所の選択肢を生成
+PLACES.forEach((pl,idx)=>{
+  const o=document.createElement('option');o.value=idx;o.textContent=pl.n;bplace.appendChild(o);
+});
+bplace.value=0; // 既定: 日本
+
 bday.addEventListener('change',checkReady);
 function checkReady(){castBtn.disabled=!(bday.value && selPhase!==null);}
 
-/* ========== 月星座の概算計算 ========== */
-/* Paul Schlyter の簡易式 + 主要摂動項。月の黄経からサインを判定 */
-function moonSign(dateStr){
-  const d=new Date(dateStr+'T12:00:00Z'); // 正午UTで概算
-  // 2000 Jan 0.0 TU からの日数
-  const dayNum=(d.getTime()/86400000) - 10956.0; // 元期 2000 Jan 0.0(UT)
-  const rad=Math.PI/180, rev=x=>((x%360)+360)%360;
-  // 月の軌道要素
-  let N=125.1228-0.0529538083*dayNum;
-  let i=5.1454;
-  let w=318.0634+0.1643573223*dayNum;
-  let M=115.3654+13.0649929509*dayNum;
+// 生まれた時の月の形を自動判定
+autoBtn.addEventListener('click',()=>{
+  if(!bday.value){autoResult.className='auto-result on';autoResult.textContent='先に「生まれた日」を入力してください。';return;}
+  const tz=PLACES[+bplace.value].tz;
+  const dayNum=dayNumFromInputs(bday.value,btime.value,tz);
+  const phaseIdx=moonPhaseFromDayNum(dayNum);
+  // グリッドの該当ボタンを選択
+  const el=phaseGrid.querySelector(`[data-idx="${phaseIdx}"]`);
+  selectPhase(phaseIdx,el);
+  autoResult.className='auto-result on';
+  const t=btime.value?`${btime.value}頃`:'時間未入力';
+  autoResult.innerHTML=`✨ あなたが生まれた夜の月は <b style="color:#fff">「${PHASES[phaseIdx].name}」</b> でした<br><span style="opacity:.75;font-size:12px">（${bday.value} ${t} / ${PLACES[+bplace.value].n.replace(/（.*）/,'')}）</span>`;
+});
+
+/* ========== 太陽・月の黄経の概算計算 ========== */
+/* Paul Schlyter の簡易式 + 主要摂動項 */
+const RAD=Math.PI/180, rev=x=>((x%360)+360)%360;
+
+/* 入力(日付・時間・場所のタイムゾーン)から元期2000 Jan 0.0(UT)基準の日数を得る */
+function dayNumFromInputs(dateStr,timeStr,tz){
+  const [y,mo,da]=dateStr.split('-').map(Number);
+  const [hh,mi]=(timeStr||'12:00').split(':').map(Number);
+  const utcMs=Date.UTC(y,mo-1,da,hh,mi)-tz*3600000; // 現地時刻→UTCへ
+  return utcMs/86400000 - 10956.0;
+}
+
+/* 太陽の黄経 */
+function sunLongitude(dayNum){
+  const w=282.9404+4.70935e-5*dayNum;
+  const e=0.016709-1.151e-9*dayNum;
+  const M=rev(356.0470+0.9856002585*dayNum);
+  let E=M+(180/Math.PI)*e*Math.sin(M*RAD)*(1+e*Math.cos(M*RAD));
+  const xv=Math.cos(E*RAD)-e, yv=Math.sqrt(1-e*e)*Math.sin(E*RAD);
+  const v=rev((180/Math.PI)*Math.atan2(yv,xv));
+  return rev(v+w);
+}
+
+/* 月の黄経 */
+function moonLongitude(dayNum){
+  let N=rev(125.1228-0.0529538083*dayNum);
+  const i=5.1454;
+  const w=318.0634+0.1643573223*dayNum;
+  let M=rev(115.3654+13.0649929509*dayNum);
   const e=0.054900,a=60.2666;
-  // 太陽の要素（摂動用）
-  let Ms=356.0470+0.9856002585*dayNum;
-  let ws=282.9404+4.70935e-5*dayNum;
-  M=rev(M);Ms=rev(Ms);N=rev(N);
-  // 離心近点角
-  let E=M+ (180/Math.PI)*e*Math.sin(M*rad)*(1+e*Math.cos(M*rad));
+  let Ms=rev(356.0470+0.9856002585*dayNum);
+  const ws=282.9404+4.70935e-5*dayNum;
+  let E=M+(180/Math.PI)*e*Math.sin(M*RAD)*(1+e*Math.cos(M*RAD));
   for(let k=0;k<6;k++){
-    E=E-(E-(180/Math.PI)*e*Math.sin(E*rad)-M)/(1-e*Math.cos(E*rad));
+    E=E-(E-(180/Math.PI)*e*Math.sin(E*RAD)-M)/(1-e*Math.cos(E*RAD));
   }
-  // 直交座標→距離・真近点角
-  const xv=a*(Math.cos(E*rad)-e);
-  const yv=a*Math.sqrt(1-e*e)*Math.sin(E*rad);
+  const xv=a*(Math.cos(E*RAD)-e);
+  const yv=a*Math.sqrt(1-e*e)*Math.sin(E*RAD);
   const v=rev((180/Math.PI)*Math.atan2(yv,xv));
   const r=Math.sqrt(xv*xv+yv*yv);
-  // 黄道座標
-  const xh=r*(Math.cos(N*rad)*Math.cos((v+w)*rad)-Math.sin(N*rad)*Math.sin((v+w)*rad)*Math.cos(i*rad));
-  const yh=r*(Math.sin(N*rad)*Math.cos((v+w)*rad)+Math.cos(N*rad)*Math.sin((v+w)*rad)*Math.cos(i*rad));
+  const xh=r*(Math.cos(N*RAD)*Math.cos((v+w)*RAD)-Math.sin(N*RAD)*Math.sin((v+w)*RAD)*Math.cos(i*RAD));
+  const yh=r*(Math.sin(N*RAD)*Math.cos((v+w)*RAD)+Math.cos(N*RAD)*Math.sin((v+w)*RAD)*Math.cos(i*RAD));
   let lon=rev((180/Math.PI)*Math.atan2(yh,xh));
-  // 主要摂動項
-  const Lm=rev(N+w+M);            // 月の平均黄経
-  const Ls=rev(Ms+ws);            // 太陽の平均黄経
-  const Dm=rev(Lm-Ls);            // 平均離角
-  const F=rev(Lm-N);              // 緯度引数
-  lon+= -1.274*Math.sin((M-2*Dm)*rad)
-        +0.658*Math.sin(2*Dm*rad)
-        -0.186*Math.sin(Ms*rad)
-        -0.059*Math.sin((2*M-2*Dm)*rad)
-        -0.057*Math.sin((M-2*Dm+Ms)*rad)
-        +0.053*Math.sin((M+2*Dm)*rad)
-        +0.046*Math.sin((2*Dm-Ms)*rad)
-        +0.041*Math.sin((M-Ms)*rad)
-        -0.035*Math.sin(Dm*rad)
-        -0.031*Math.sin((M+Ms)*rad)
-        -0.015*Math.sin((2*F-2*Dm)*rad)
-        +0.011*Math.sin((M-4*Dm)*rad);
-  lon=rev(lon);
-  return Math.floor(lon/30); // 0..11
+  const Lm=rev(N+w+M), Ls=rev(Ms+ws), Dm=rev(Lm-Ls), F=rev(Lm-N);
+  lon+= -1.274*Math.sin((M-2*Dm)*RAD)
+        +0.658*Math.sin(2*Dm*RAD)
+        -0.186*Math.sin(Ms*RAD)
+        -0.059*Math.sin((2*M-2*Dm)*RAD)
+        -0.057*Math.sin((M-2*Dm+Ms)*RAD)
+        +0.053*Math.sin((M+2*Dm)*RAD)
+        +0.046*Math.sin((2*Dm-Ms)*RAD)
+        +0.041*Math.sin((M-Ms)*RAD)
+        -0.035*Math.sin(Dm*RAD)
+        -0.031*Math.sin((M+Ms)*RAD)
+        -0.015*Math.sin((2*F-2*Dm)*RAD)
+        +0.011*Math.sin((M-4*Dm)*RAD);
+  return rev(lon);
+}
+
+/* 月星座(0..11) */
+function moonSignFromDayNum(dayNum){ return Math.floor(moonLongitude(dayNum)/30); }
+
+/* 月相(0..7)を月と太陽の離角から判定。PHASES配列の並びに対応 */
+function moonPhaseFromDayNum(dayNum){
+  const D=rev(moonLongitude(dayNum)-sunLongitude(dayNum)); // 0=新月,90=上弦,180=満月,270=下弦
+  return Math.floor((rev(D+22.5))/45); // 0..7
 }
 
 /* ========== 12星座（月星座）の読み ========== */
@@ -403,7 +514,9 @@ castBtn.addEventListener('click',()=>{
 });
 
 function showResult(){
-  const idx=moonSign(bday.value);
+  const tz=PLACES[+bplace.value].tz;
+  const dayNum=dayNumFromInputs(bday.value,btime.value,tz);
+  const idx=moonSignFromDayNum(dayNum);
   const s=SIGNS[idx];
   const p=PHASES[selPhase];
   const phaseMsg=PHASE_MSG[p.key];
@@ -420,6 +533,15 @@ function showResult(){
         <h3>月からのメッセージ</h3>
         <p>${s.care}</p>
       </div>
+
+      <div class="promo">
+        <div class="pt">もっと深く、あなただけの月を読み解きませんか?</div>
+        <div class="ps">${LINE_NAME}のLINEでは、月星座をいかしたメッセージや<br>運勢をお届けしています。ぜひ友だち追加してください🌙</div>
+        <a class="line-btn" href="${LINE_URL}" target="_blank" rel="noopener">
+          <span class="line-ico">L</span>${LINE_NAME}のLINEを追加する
+        </a>
+      </div>
+
       <button class="again" onclick="reset()">もう一度占う</button>
     </div>`;
   resultEl.classList.add('show');
