@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#07061a">
+<title>今日の運勢ガチャ 〜星のカプセル〜</title>
+<style>
+  :root{
+    --gold:#e7c873;--gold-soft:#f6e7b6;--violet:#8a7bff;--teal:#67e8d6;
+    --ink:#05041a;--ink2:#0e0b33;--text:#efeaff;--line:#06c755;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",-apple-system,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -8%,#241a5e 0%,rgba(20,12,60,.4) 40%,transparent 70%),
+      radial-gradient(900px 500px at 85% 12%,rgba(103,232,214,.14),transparent 60%),
+      radial-gradient(900px 500px at 10% 18%,rgba(138,123,255,.18),transparent 60%),
+      linear-gradient(180deg,var(--ink2),var(--ink) 60%,#020111);
+    background-attachment:fixed;color:var(--text);min-height:100vh;overflow-x:hidden;position:relative;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .serif{font-family:"Hiragino Mincho ProN","Yu Mincho",serif}
+  #stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:tw var(--d,4s) ease-in-out infinite}
+  @keyframes tw{0%,100%{opacity:.12;transform:scale(.7)}50%{opacity:.95;transform:scale(1.25)}}
+
+  .wrap{position:relative;z-index:2;max-width:520px;margin:0 auto;padding:38px 18px 70px;text-align:center}
+  .hero h1{font-size:clamp(26px,7.5vw,38px);font-weight:400;letter-spacing:.14em;
+    text-shadow:0 0 22px rgba(231,200,115,.55);margin-bottom:8px}
+  .hero .sub{color:var(--gold-soft);font-size:13px;letter-spacing:.2em;opacity:.9;margin-bottom:26px}
+
+  /* ====== ガチャマシン ====== */
+  .machine{width:230px;margin:6px auto 18px;position:relative;transition:transform .1s}
+  .machine.shake{animation:shake .4s linear infinite}
+  @keyframes shake{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(-4px,2px) rotate(-1.2deg)}
+    50%{transform:translate(3px,-2px) rotate(1deg)}75%{transform:translate(-2px,3px) rotate(-.6deg)}}
+  .dome{width:170px;height:160px;margin:0 auto;border-radius:50% 50% 46% 46%;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 38% 30%,rgba(255,255,255,.55),rgba(180,210,255,.25) 55%,rgba(120,150,220,.18));
+    border:3px solid rgba(255,255,255,.5);box-shadow:inset 0 10px 30px rgba(255,255,255,.4),0 0 30px rgba(138,123,255,.4)}
+  .dome .cap{position:absolute;width:30px;height:30px;border-radius:50%;box-shadow:inset -4px -5px 8px rgba(0,0,0,.25)}
+  .neck{width:120px;height:20px;margin:-4px auto 0;background:linear-gradient(180deg,#3a2f7a,#241c55);border-radius:0 0 8px 8px}
+  .base{width:200px;height:124px;margin:0 auto;border-radius:16px 16px 20px 20px;position:relative;
+    background:linear-gradient(180deg,#e0466b,#b8284f);box-shadow:0 10px 26px rgba(0,0,0,.45),inset 0 3px 0 rgba(255,255,255,.25)}
+  .base .label{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:800;
+    color:#fff;letter-spacing:.18em;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+  .knob{position:absolute;left:50%;top:54px;transform:translateX(-50%);width:54px;height:54px;border-radius:50%;
+    background:radial-gradient(circle at 38% 32%,#fff,#cfd6e6 60%,#9aa3bd);box-shadow:0 4px 10px rgba(0,0,0,.4);
+    transition:transform .2s}
+  .knob::before,.knob::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    background:#7a839e;border-radius:3px}
+  .knob::before{width:30px;height:7px}.knob::after{width:7px;height:30px}
+  .knob.turn{animation:turn 1.1s cubic-bezier(.5,0,.3,1)}
+  @keyframes turn{from{transform:translateX(-50%) rotate(0)}to{transform:translateX(-50%) rotate(450deg)}}
+  .tray{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:74px;height:34px;border-radius:8px;
+    background:rgba(0,0,0,.4);box-shadow:inset 0 4px 10px rgba(0,0,0,.6)}
+  .tray .out{position:absolute;left:50%;top:-2px;transform:translateX(-50%);width:64px;height:18px;border-radius:0 0 10px 10px;
+    background:linear-gradient(180deg,#1a1430,#0d0a22)}
+
+  .spinbtn{margin-top:6px;width:100%;max-width:300px;padding:18px;border:none;border-radius:999px;cursor:pointer;
+    font-family:inherit;font-size:19px;font-weight:800;letter-spacing:.16em;color:#1a1405;position:relative;overflow:hidden;
+    background:linear-gradient(90deg,#d9b65f,#f8ecbf,#d9b65f);box-shadow:0 8px 30px rgba(231,200,115,.5);
+    transition:transform .15s,filter .15s}
+  .spinbtn:hover{transform:translateY(-2px);filter:brightness(1.06)}
+  .spinbtn:disabled{opacity:.45;filter:grayscale(.5);cursor:not-allowed}
+  .spinbtn .shine{position:absolute;top:0;left:-60%;width:40%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);animation:shine 3s ease-in-out infinite}
+  @keyframes shine{0%{left:-60%}55%,100%{left:130%}}
+  .lock-note{margin-top:14px;font-size:13px;color:var(--gold-soft);letter-spacing:.04em;line-height:1.7}
+  .lock-note b{color:#fff}
+
+  .note{font-size:11px;opacity:.5;margin-top:26px;line-height:1.9;letter-spacing:.03em}
+  .reset{color:#9c97c0;text-decoration:underline;cursor:pointer;background:none;border:none;font-family:inherit;font-size:11px}
+
+  /* ====== 演出オーバーレイ ====== */
+  #ov{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;overflow:hidden;
+    background:radial-gradient(ellipse at 50% 50%,#161046,#0a0726 50%,#020010)}
+  #ov.show{display:flex}
+  #ov.special{background:radial-gradient(ellipse at 50% 50%,#3a2a10,#1a1240 45%,#05030f)}
+  .rays{position:absolute;inset:-30%;pointer-events:none;opacity:0;
+    background:repeating-conic-gradient(from 0deg,rgba(255,225,150,.0) 0deg,rgba(255,225,150,.0) 8deg,rgba(255,225,150,.35) 9deg,rgba(255,225,150,0) 18deg);
+    animation:rayspin 6s linear infinite}
+  @keyframes rayspin{to{transform:rotate(360deg)}}
+  .rays.on{opacity:.9}
+  .glowring{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.5);animation:expand 1.6s ease-out infinite}
+  @keyframes expand{from{width:80px;height:80px;opacity:.9}to{width:480px;height:480px;opacity:0}}
+
+  .capsule{width:150px;height:150px;position:relative;z-index:4;transform:scale(.2);opacity:0}
+  .capsule.in{animation:capin .7s cubic-bezier(.2,1.3,.4,1) forwards}
+  @keyframes capin{to{transform:scale(1);opacity:1}}
+  .capsule.bob{animation:bob 1.1s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-12px) rotate(4deg)}}
+  .ch{position:absolute;left:0;width:150px;height:75px;overflow:hidden}
+  .ch.top{top:0}.ch.bot{bottom:0}
+  .ch .sk{position:absolute;left:0;width:150px;height:150px;border-radius:50%;
+    box-shadow:inset -16px -14px 30px rgba(0,0,0,.28),inset 10px 10px 22px rgba(255,255,255,.5)}
+  .ch.top .sk{top:0}.ch.bot .sk{bottom:0}
+  .ch.top{border-radius:75px 75px 0 0}
+  .ch.bot{border-radius:0 0 75px 75px}
+  .capsule .seam{position:absolute;left:0;top:71px;width:150px;height:8px;background:rgba(0,0,0,.18);border-radius:4px;z-index:2}
+  .capsule.open .ch.top{animation:openTop .6s ease forwards}
+  .capsule.open .ch.bot{animation:openBot .6s ease forwards}
+  @keyframes openTop{to{transform:translateY(-120px) rotate(-12deg);opacity:0}}
+  @keyframes openBot{to{transform:translateY(120px) rotate(12deg);opacity:0}}
+  .core{position:absolute;left:50%;top:50%;width:30px;height:30px;border-radius:50%;transform:translate(-50%,-50%) scale(0);
+    background:radial-gradient(circle,#fff,rgba(255,255,255,0) 70%);z-index:1}
+  .capsule.open .core{animation:coreburst .7s ease-out forwards}
+  @keyframes coreburst{0%{transform:translate(-50%,-50%) scale(0);opacity:1}
+    100%{transform:translate(-50%,-50%) scale(16);opacity:0}}
+
+  .ov-text{position:absolute;bottom:16%;left:0;right:0;text-align:center;z-index:6;padding:0 24px}
+  .ov-text .line{font-family:"Hiragino Mincho ProN",serif;font-size:19px;letter-spacing:.2em;color:#fff;
+    text-shadow:0 0 16px rgba(231,200,115,.85);opacity:0;transition:opacity .45s}
+  .ov-text .line.on{opacity:1}
+  .rarity-call{position:absolute;top:18%;left:0;right:0;text-align:center;z-index:6;font-weight:900;
+    font-size:30px;letter-spacing:.1em;opacity:0;transform:scale(.6)}
+  .rarity-call.on{animation:pop .6s cubic-bezier(.2,1.4,.4,1) forwards}
+  @keyframes pop{to{opacity:1;transform:scale(1)}}
+
+  .spark{position:absolute;width:8px;height:8px;pointer-events:none;
+    background:radial-gradient(circle,#fff,transparent 70%);animation:sparkle 1.4s ease-in-out infinite;z-index:5}
+  @keyframes sparkle{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.4)}}
+  .confetti{position:absolute;top:-20px;width:10px;height:14px;z-index:5;border-radius:2px;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+  .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:9}
+  .flash.fire{animation:flash .8s ease-out}
+  @keyframes flash{0%{opacity:0}16%{opacity:.96}100%{opacity:0}}
+  .ov.shake,#ov.shake{animation:ovshake .35s linear infinite}
+  @keyframes ovshake{0%,100%{transform:translate(0,0)}25%{transform:translate(-6px,4px)}50%{transform:translate(5px,-5px)}75%{transform:translate(-4px,-3px)}}
+
+  /* ====== 結果 ====== */
+  #result{margin-top:24px;display:none}
+  #result.show{display:block;animation:rise 1s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+  .card{background:rgba(255,255,255,.05);border:1px solid rgba(231,200,115,.3);border-radius:20px;padding:24px 18px;
+    backdrop-filter:blur(6px);box-shadow:0 14px 40px rgba(0,0,0,.45);position:relative;overflow:hidden}
+  .card.r-rare{border-color:rgba(103,232,214,.6);box-shadow:0 0 40px rgba(103,232,214,.3)}
+  .card.r-special{border-color:rgba(231,200,115,.8);box-shadow:0 0 50px rgba(231,200,115,.45)}
+  .rtag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;padding:5px 14px;border-radius:999px;margin-bottom:12px}
+  .rtag.normal{background:rgba(180,200,255,.2);color:#cdd8ff;border:1px solid rgba(180,200,255,.5)}
+  .rtag.rare{background:rgba(103,232,214,.18);color:#aef5ea;border:1px solid rgba(103,232,214,.6)}
+  .rtag.special{background:linear-gradient(90deg,#f8ecbf,#d9b65f);color:#1a1405;border:1px solid #f8ecbf}
+  .rank{font-family:"Hiragino Mincho ProN",serif;font-size:46px;letter-spacing:.08em;color:var(--gold);
+    text-shadow:0 0 22px rgba(231,200,115,.6);line-height:1.1;margin-bottom:4px}
+  .card.r-rare .rank{color:var(--teal);text-shadow:0 0 22px rgba(103,232,214,.6)}
+  .rtitle{font-size:17px;font-weight:700;letter-spacing:.04em;margin-bottom:14px}
+  .rmsg{font-size:15px;line-height:2;text-align:left;margin:0 4px 18px}
+  .lucky{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 4px;text-align:left}
+  .lk{background:rgba(255,255,255,.05);border:1px solid rgba(231,200,115,.25);border-radius:12px;padding:11px 13px}
+  .lk .k{font-size:11px;color:#a9a3d6;letter-spacing:.04em;margin-bottom:3px}
+  .lk .v{font-size:15px;font-weight:700;color:var(--gold-soft)}
+
+  .promo{margin-top:22px;padding:22px 18px;border-radius:18px;text-align:center;
+    background:linear-gradient(180deg,rgba(6,199,85,.18),rgba(6,199,85,.06));border:1px solid rgba(6,199,85,.5)}
+  .promo .pt{font-size:16px;letter-spacing:.03em;line-height:1.7;color:#eafff0;font-weight:700}
+  .promo .ps{font-size:12.5px;color:#bfe9cc;margin-top:8px;line-height:1.8}
+  .line-btn{display:inline-flex;align-items:center;gap:9px;margin-top:15px;padding:14px 28px;border-radius:999px;
+    text-decoration:none;background:var(--line);color:#fff;font-weight:700;font-size:15.5px;letter-spacing:.04em;
+    box-shadow:0 8px 24px rgba(6,199,85,.5);transition:transform .2s,filter .2s}
+  .line-btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
+  .line-ico{width:24px;height:24px;background:#fff;border-radius:7px;color:var(--line);display:inline-flex;
+    align-items:center;justify-content:center;font-weight:800;font-size:14px;font-family:Arial,sans-serif}
+  .again-note{margin-top:20px;font-size:13px;color:var(--gold-soft);letter-spacing:.04em;line-height:1.7}
+
+  @media (prefers-reduced-motion:reduce){.star,.rays,.spinbtn .shine{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+
+<div class="wrap">
+  <div class="hero">
+    <h1 class="serif">今日の運勢ガチャ</h1>
+    <div class="sub">― 星のカプセルが、今日のあなたを占う ―</div>
+  </div>
+
+  <div class="machine" id="machine">
+    <div class="dome" id="dome"></div>
+    <div class="neck"></div>
+    <div class="base">
+      <div class="label">★ FORTUNE ★</div>
+      <div class="knob" id="knob"></div>
+      <div class="tray"><div class="out"></div></div>
+    </div>
+  </div>
+
+  <button class="spinbtn" id="spinBtn"><span class="shine"></span>ガチャを回す</button>
+  <div class="lock-note" id="lockNote"></div>
+
+  <div id="result"></div>
+
+  <div class="note">
+    1日1回まわせる運勢ガチャです（エンターテインメント占い）。<br>
+    レアリティ確率 … ノーマル70％ / レア20％ / スペシャル10％<br>
+    <button class="reset" id="resetBtn">（テスト用：今日の履歴をリセット）</button>
+  </div>
+</div>
+
+<!-- 演出 -->
+<div id="ov">
+  <div class="rays" id="rays"></div>
+  <div class="rarity-call" id="rarityCall"></div>
+  <div class="glowring" id="gr1" style="display:none"></div>
+  <div class="capsule" id="capsule">
+    <div class="core"></div>
+    <div class="ch top"><div class="sk" id="skTop"></div></div>
+    <div class="ch bot"><div class="sk" id="skBot"></div></div>
+    <div class="seam"></div>
+  </div>
+  <div class="ov-text"><div class="line" id="ovLine"></div></div>
+  <div class="flash" id="flash"></div>
+</div>
+
+<script>
+/* ====== LINE（マドモアゼル愛先生 公式）====== */
+const LINE_URL="https://mademoiselle-ai.com/login";
+const LINE_NAME="マドモアゼル愛先生";
+
+/* ====== レアリティ設定（確率 7:2:1）====== */
+const RARITY={
+  normal :{label:'ノーマル',cls:'normal',cap1:'#bcd2ff',cap2:'#e7f0ff',call:'',callColor:'#cdd8ff',sparks:6,dur:2400},
+  rare   :{label:'レア',   cls:'rare',  cap1:'#7fe6d6',cap2:'#caf7f0',call:'✦ レア ✦',callColor:'#aef5ea',sparks:14,dur:3400},
+  special:{label:'スペシャル',cls:'special',cap1:'#f0c659',cap2:'#fff1c2',call:'★ SPECIAL ★',callColor:'#ffe79b',sparks:24,dur:4600},
+};
+function rollRarity(){const r=Math.random();return r<0.70?'normal':r<0.90?'rare':'special';} // 70/20/10
+
+/* ====== 運勢プール（レアリティ別）====== */
+const FORTUNES={
+  normal:[
+    {rank:'吉',title:'笑顔がツキを呼ぶ',msg:'肩の力を抜いて過ごせる一日。あなたの何気ない笑顔が、まわりの空気をやわらかくします。いつも通りを大切に。',color:'若草色',item:'あたたかい飲みもの',act:'深呼吸をする',num:3},
+    {rank:'小吉',title:'小さな発見がある日',msg:'急がず歩けば、道ばたの小さな幸せに気づけます。当たり前の中にあるありがたさが、心を満たしてくれそう。',color:'スカイブルー',item:'お気に入りのペン',act:'いつもと違う道を通る',num:7},
+    {rank:'末吉',title:'マイペースが心地よい',msg:'人と比べなくて大丈夫。あなたの速度で進むほど、今日は物事がうまく回ります。焦りは手放して。',color:'アイボリー',item:'ハンカチ',act:'机をひとつ片づける',num:2},
+    {rank:'吉',title:'あいさつから良い流れ',msg:'最初のひと声が、今日の運の入り口。明るいあいさつが、思いがけない縁や情報を運んできます。',color:'オレンジ',item:'手帳',act:'笑顔であいさつ',num:5},
+    {rank:'小吉',title:'丁寧さが運を連れてくる',msg:'ひとつひとつ、ていねいに。あなたの細やかさに気づいてくれる人がいます。誠実さが今日の味方です。',color:'ベージュ',item:'香りのいいもの',act:'お礼を言葉にする',num:8},
+    {rank:'末吉',title:'ひと休みが吉',msg:'がんばりすぎは禁物。少し立ち止まって息を整えると、午後から運気が上向きます。自分にやさしく。',color:'ラベンダー',item:'おやつ',act:'5分だけ目を閉じる',num:4},
+    {rank:'吉',title:'整えると運気アップ',msg:'身のまわりを少し整えるだけで、心まですっきり。新しい運の通り道ができる日。気軽に断捨離を。',color:'ミントグリーン',item:'タオル',act:'カバンの中を整理',num:6},
+    {rank:'小吉',title:'いつも通りが一番',msg:'特別なことは必要ありません。いつものルーティンを淡々とこなすことが、今日の安定運につながります。',color:'グレー',item:'マグカップ',act:'白湯を一杯飲む',num:1},
+  ],
+  rare:[
+    {rank:'中吉',title:'うれしい知らせの予感',msg:'思いがけない所から、ちょっと心が弾むニュースが届きそう。アンテナを立てておくと、幸運をしっかり掴めます。',color:'ターコイズ',item:'スマホのお気に入り画面',act:'返信は早めに',num:11},
+    {rank:'中吉',title:'人とのご縁が広がる',msg:'今日出会う人、再会する人が、未来のキーパーソンかも。ひとつの会話を大切にすると、輪がぐっと広がります。',color:'コーラルピンク',item:'名刺やSNS',act:'気になる人に連絡',num:14},
+    {rank:'中吉',title:'ひらめきが冴える日',msg:'頭の回転がいつもよりクリア。迷っていたことに、ふっと答えが降りてきそう。メモを取る準備を。',color:'エレクトリックブルー',item:'メモ帳',act:'思いつきを書き留める',num:9},
+    {rank:'中吉',title:'努力が報われはじめる',msg:'これまでの積み重ねに、光が差し込む日。小さな成果が見えはじめ、自信が次の一歩を後押しします。',color:'ゴールドベージュ',item:'お守り',act:'今日の頑張りを褒める',num:22},
+    {rank:'中吉',title:'幸運が舞い込む',msg:'予想外のラッキーがやってくる気配。「ありがとう」を多めに口にすると、さらに運が乗ってきます。',color:'シャンパンゴールド',item:'光るアクセサリー',act:'空を見上げる',num:13},
+  ],
+  special:[
+    {rank:'大吉',title:'運命が動き出す日',msg:'流れが大きく味方する、特別な一日。ためらっていたことに踏み出すなら今。あなたの選択が、未来をまばゆく照らします。',color:'ロイヤルゴールド',item:'新しい何か',act:'勇気を出して一歩',num:8},
+    {rank:'大吉',title:'願いが叶いやすい日',msg:'宇宙の後押しが届くタイミング。心の奥の願いを、はっきり言葉にしてみて。叶うための扉が、静かに開きます。',color:'パールホワイト',item:'お気に入りの一着',act:'願いを紙に書く',num:21},
+    {rank:'超大吉',title:'最高潮の運気！',msg:'今日のあなたは、星々の主役。思い切った行動ほど、大きな実りに変わります。輝きを惜しまず、堂々と前へ。',color:'レインボー',item:'とびきりの笑顔',act:'大きな声で「やる！」',num:7},
+    {rank:'大吉',title:'すべてが味方する',msg:'人も、時間も、めぐり合わせも、今日はあなたの応援団。困りごとは思いのほかスルッと解決。感謝を循環させて。',color:'サンライズオレンジ',item:'感謝の言葉',act:'誰かを助ける',num:33},
+  ],
+};
+
+/* ====== 星空 ====== */
+(function(){const c=document.getElementById('stars');for(let i=0;i<110;i++){const s=document.createElement('div');
+  s.className='star';const z=Math.random()*2+1;s.style.width=s.style.height=z+'px';
+  s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+  s.style.setProperty('--d',(Math.random()*4+2)+'s');s.style.animationDelay=(Math.random()*4)+'s';c.appendChild(s);}})();
+
+/* ドーム内のカプセル飾り */
+(function(){const dome=document.getElementById('dome');const cols=['#ff6b8a','#ffd45e','#6be0c0','#8aa9ff','#c79bff','#ff9b6b'];
+  const pos=[[18,22],[52,16],[86,30],[30,52],[64,50],[100,58],[14,78],[48,80],[82,76]];
+  pos.forEach(([x,y],i)=>{const c=document.createElement('div');c.className='cap';
+    c.style.left=(x-15)+'px';c.style.top=(y)+'px';const col=cols[i%cols.length];
+    c.style.background=`radial-gradient(circle at 35% 30%,#fff,${col} 60%)`;dome.appendChild(c);});})();
+
+/* ====== 1日1回ロック ====== */
+const KEY='dailyGacha';
+function todayStr(){const d=new Date();return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;}
+function loadToday(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}');return o.date===todayStr()?o:null;}catch(e){return null;}}
+function saveToday(rarity,fIdx){localStorage.setItem(KEY,JSON.stringify({date:todayStr(),rarity,fIdx}));}
+
+const $=id=>document.getElementById(id);
+const spinBtn=$('spinBtn'),lockNote=$('lockNote');
+
+function refreshLock(){
+  const t=loadToday();
+  if(t){
+    spinBtn.disabled=true;
+    lockNote.innerHTML=`今日のガチャは引き終わりました🌙<br>また<b>明日</b>挑戦してください。`;
+    const f=FORTUNES[t.rarity][t.fIdx];
+    showResult(t.rarity,f,true);
+  }else{
+    spinBtn.disabled=false;
+    lockNote.innerHTML='今日の運勢はまだ。<b>1日1回</b>、回せます！';
+    $('result').classList.remove('show');$('result').innerHTML='';
+  }
+}
+
+/* ====== ガチャ実行 ====== */
+const ov=$('ov'),machine=$('machine'),knob=$('knob'),capsule=$('capsule'),ovLine=$('ovLine'),
+      rays=$('rays'),rarityCall=$('rarityCall'),flash=$('flash');
+let busy=false;
+
+spinBtn.addEventListener('click',()=>{
+  if(busy||loadToday())return;busy=true;spinBtn.disabled=true;
+  const rarity=rollRarity();
+  const pool=FORTUNES[rarity];const fIdx=Math.floor(Math.random()*pool.length);
+  saveToday(rarity,fIdx);
+  playGacha(rarity,pool[fIdx],fIdx);
+});
+
+function spawnSpark(host){const s=document.createElement('div');s.className='spark';
+  s.style.left=(12+Math.random()*76)+'%';s.style.top=(18+Math.random()*60)+'%';
+  s.style.animationDelay=(Math.random()*.5)+'s';host.appendChild(s);setTimeout(()=>s.remove(),1500);}
+function confettiBurst(){const cols=['#ffd45e','#ff6b8a','#6be0c0','#8aa9ff','#c79bff','#fff'];
+  for(let i=0;i<70;i++){const c=document.createElement('div');c.className='confetti';
+    c.style.left=Math.random()*100+'%';c.style.background=cols[i%cols.length];
+    c.style.animationDuration=(1.6+Math.random()*1.6)+'s';c.style.animationDelay=(Math.random()*.3)+'s';
+    ov.appendChild(c);setTimeout(()=>c.remove(),3600);}}
+
+function playGacha(rarity,fortune,fIdx){
+  const R=RARITY[rarity];
+  // 1) マシンを回す
+  machine.classList.add('shake');knob.classList.add('turn');
+  setTimeout(()=>{machine.classList.remove('shake');knob.classList.remove('turn');},1100);
+
+  // 2) オーバーレイ起動
+  setTimeout(()=>{
+    ov.className='show'+(rarity==='special'?' special':'');
+    rays.className='rays';rarityCall.className='rarity-call';rarityCall.textContent='';
+    flash.classList.remove('fire');
+    // カプセル配色
+    $('skTop').style.background=`radial-gradient(circle at 38% 30%,#fff,${R.cap2} 45%,${R.cap1})`;
+    $('skBot').style.background=`radial-gradient(circle at 38% 70%,${R.cap1},${R.cap2} 70%)`;
+    capsule.className='capsule in';
+    setTimeout(()=>capsule.classList.add('bob'),700);
+
+    // レア以上の追加演出
+    if(rarity!=='normal'){rays.classList.add('on');}
+    if(rarity==='rare'){$('gr1').style.display='block';}else{$('gr1').style.display='none';}
+    // きらめき
+    let sc=0;const sparkTimer=setInterval(()=>{spawnSpark(ov);if(++sc>R.dur/300)clearInterval(sparkTimer);},300);
+
+    // メッセージ
+    const lines = rarity==='special'
+      ? ['カプセルが、まばゆく光っている…','これは……','とてつもない予感がする…！']
+      : rarity==='rare'
+      ? ['お……このカプセル、輝いてる？','いつもと、ちがう気配…','幸運の香りがする…']
+      : ['コロン…とカプセルが出てきた','今日のあなたの運勢は…','そっと、開けてみよう'];
+    let li=0;ovLine.textContent=lines[0];ovLine.classList.add('on');
+    const step=(R.dur-900)/lines.length;
+    const tT=setInterval(()=>{ovLine.classList.remove('on');
+      setTimeout(()=>{li++;if(li<lines.length){ovLine.textContent=lines[li];ovLine.classList.add('on');}},380);},step);
+
+    // レアリティコール（レア以上）
+    if(rarity!=='normal'){
+      setTimeout(()=>{rarityCall.textContent=R.call;rarityCall.style.color=R.callColor;rarityCall.classList.add('on');},R.dur*0.45);
+    }
+    // スペシャルは紙吹雪＆シェイク
+    if(rarity==='special'){
+      setTimeout(()=>{confettiBurst();ov.classList.add('shake');setTimeout(()=>ov.classList.remove('shake'),900);},R.dur*0.5);
+    }
+
+    // 3) フィナーレ：カプセルを開ける
+    setTimeout(()=>{
+      clearInterval(tT);clearInterval(sparkTimer);
+      capsule.classList.remove('bob');capsule.classList.add('open');
+      flash.classList.add('fire');
+      if(rarity==='special'){confettiBurst();}
+      setTimeout(()=>{
+        ov.className='';busy=false;
+        spinBtn.disabled=true;
+        showResult(rarity,fortune,false);
+        lockNote.innerHTML='今日のガチャは引き終わりました🌙<br>また<b>明日</b>挑戦してください。';
+      },650);
+    },R.dur);
+  },900);
+}
+
+/* ====== 結果表示 ====== */
+function showResult(rarity,f,silent){
+  const R=RARITY[rarity];
+  const rtagCls=rarity, rtagTxt=R.label;
+  const result=$('result');
+  result.innerHTML=`
+    <div class="card r-${rarity}">
+      <span class="rtag ${rtagCls}">${rtagTxt}</span>
+      <div class="rank">${f.rank}</div>
+      <div class="rtitle">${f.title}</div>
+      <div class="rmsg">${f.msg}</div>
+      <div class="lucky">
+        <div class="lk"><div class="k">ラッキーカラー</div><div class="v">${f.color}</div></div>
+        <div class="lk"><div class="k">ラッキーアイテム</div><div class="v">${f.item}</div></div>
+        <div class="lk"><div class="k">ラッキーアクション</div><div class="v">${f.act}</div></div>
+        <div class="lk"><div class="k">ラッキーナンバー</div><div class="v">${f.num}</div></div>
+      </div>
+      <div class="promo">
+        <div class="pt">明日の運勢、もっと深く知りたくありませんか?</div>
+        <div class="ps">${LINE_NAME}の公式LINEでは、あなただけの<br>月星座メッセージや運勢をお届けしています🌙</div>
+        <a class="line-btn" href="${LINE_URL}" target="_blank" rel="noopener">
+          <span class="line-ico">L</span>${LINE_NAME}のLINEを追加する</a>
+      </div>
+      <div class="again-note">またあした、新しいカプセルが待っています🎉</div>
+    </div>`;
+  result.classList.add('show');
+  if(!silent) result.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* テスト用リセット */
+$('resetBtn').addEventListener('click',()=>{localStorage.removeItem(KEY);busy=false;refreshLock();
+  window.scrollTo({top:0,behavior:'smooth'});});
+
+refreshLock();
+</script>
+</body>
+</html>
