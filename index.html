@@ -4,445 +4,526 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0a0a1f">
+<meta name="theme-color" content="#07061a">
 <title>月の占い 〜あなたの本当の心〜</title>
 <style>
   :root{
     --gold:#e7c873;
-    --gold-soft:#f3e2af;
-    --ink:#0a0a1f;
-    --ink2:#12122e;
-    --text:#eae6ff;
+    --gold-soft:#f6e7b6;
+    --violet:#8a7bff;
+    --teal:#67e8d6;
+    --ink:#05041a;
+    --ink2:#0e0b33;
+    --text:#efeaff;
+    --card:rgba(255,255,255,.05);
+    --line:#06c755;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
-  html,body{height:100%}
   body{
-    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-    background:radial-gradient(ellipse at 50% -10%,#1c1c44 0%,var(--ink2) 45%,var(--ink) 100%);
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",-apple-system,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -8%,#241a5e 0%,rgba(20,12,60,.4) 40%,transparent 70%),
+      radial-gradient(900px 500px at 85% 12%,rgba(103,232,214,.14),transparent 60%),
+      radial-gradient(900px 500px at 10% 18%,rgba(138,123,255,.18),transparent 60%),
+      linear-gradient(180deg,var(--ink2),var(--ink) 60%,#020111);
     background-attachment:fixed;
-    color:var(--text);
-    min-height:100vh;
-    overflow-x:hidden;
-    position:relative;
+    color:var(--text);min-height:100vh;overflow-x:hidden;position:relative;
     -webkit-tap-highlight-color:transparent;
   }
-  /* 星空 */
-  #stars,#stars2{
-    position:fixed;inset:0;pointer-events:none;z-index:0;
-  }
-  .star{
-    position:absolute;border-radius:50%;background:#fff;
-    animation:twinkle var(--dur,4s) ease-in-out infinite;
-    opacity:.6;
-  }
-  @keyframes twinkle{0%,100%{opacity:.15;transform:scale(.8)}50%{opacity:.95;transform:scale(1.2)}}
+  .serif{font-family:"Hiragino Mincho ProN","Yu Mincho",serif}
 
-  .wrap{
-    position:relative;z-index:2;
-    max-width:680px;margin:0 auto;
-    padding:48px 22px 80px;
-    text-align:center;
-  }
-  h1{
-    font-size:clamp(26px,6vw,40px);
-    letter-spacing:.18em;
-    font-weight:400;
-    margin-bottom:6px;
-    text-shadow:0 0 18px rgba(231,200,115,.55);
-  }
-  .sub{
-    color:var(--gold-soft);font-size:13px;letter-spacing:.25em;
-    opacity:.85;margin-bottom:36px;
-  }
+  /* 背景の星 */
+  #stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:tw var(--d,4s) ease-in-out infinite}
+  @keyframes tw{0%,100%{opacity:.12;transform:scale(.7)}50%{opacity:.95;transform:scale(1.25)}}
 
-  /* 月のビジュアル */
-  .moon-stage{
-    width:140px;height:140px;margin:8px auto 30px;
-    position:relative;
-  }
-  .moon{
-    width:100%;height:100%;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%,#fffdf2,#e9e4cf 55%,#b9b29a 100%);
-    box-shadow:0 0 50px 8px rgba(243,226,175,.5),inset -14px -10px 30px rgba(0,0,0,.35);
-    position:relative;overflow:hidden;
-    animation:floaty 6s ease-in-out infinite;
-  }
-  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-  /* 月相を作る影 */
-  .shadow{
-    position:absolute;top:-5%;height:110%;width:110%;border-radius:50%;
-    background:var(--ink2);
-    transition:transform .6s ease, left .6s ease;
-  }
+  .wrap{position:relative;z-index:2;max-width:560px;margin:0 auto;padding:40px 18px 80px}
 
-  .card{
-    background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
-    border:1px solid rgba(231,200,115,.35);
-    border-radius:18px;
-    padding:26px 22px;
-    backdrop-filter:blur(4px);
-    box-shadow:0 10px 40px rgba(0,0,0,.4);
-  }
-  label{display:block;text-align:left;margin:18px 0 8px;font-size:14px;letter-spacing:.08em;color:var(--gold-soft)}
-  input[type=date],input[type=time],select{
-    width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(231,200,115,.4);
-    background:rgba(10,10,31,.6);color:var(--text);font-size:16px;font-family:inherit;
-  }
-  select{appearance:none;-webkit-appearance:none;cursor:pointer;
-    background-image:linear-gradient(45deg,transparent 50%,var(--gold-soft) 50%),linear-gradient(135deg,var(--gold-soft) 50%,transparent 50%);
-    background-position:calc(100% - 18px) 19px,calc(100% - 12px) 19px;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:34px;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .opt{font-size:11px;color:#9c97c0;letter-spacing:0}
-  button.auto{
-    margin-top:18px;width:100%;padding:13px;border-radius:12px;cursor:pointer;font-family:inherit;
-    font-size:14px;letter-spacing:.08em;color:var(--gold-soft);
-    background:rgba(231,200,115,.1);border:1px dashed rgba(231,200,115,.55);transition:all .2s;
-  }
-  button.auto:hover{background:rgba(231,200,115,.2)}
-  .auto-result{font-size:13px;color:var(--gold-soft);margin-top:10px;min-height:0;text-align:center;letter-spacing:.03em}
-  .auto-result.on{margin:12px 0 4px}
-  .phase-grid{
-    display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px;
-  }
-  .phase-btn{
-    cursor:pointer;border:1px solid rgba(231,200,115,.3);border-radius:12px;
-    background:rgba(255,255,255,.03);padding:12px 6px 9px;
-    transition:all .25s;color:var(--text);
-  }
-  .phase-btn:hover{border-color:var(--gold);transform:translateY(-2px)}
-  .phase-btn.sel{border-color:var(--gold);background:rgba(231,200,115,.16);box-shadow:0 0 16px rgba(231,200,115,.4)}
-  .phase-ico{
-    width:42px;height:42px;border-radius:50%;margin:0 auto 7px;position:relative;overflow:hidden;
-    background:radial-gradient(circle at 35% 30%,#fffdf2,#cfc8ad);
-  }
-  .phase-ico i{position:absolute;top:-10%;height:120%;width:120%;border-radius:50%;background:#0f0f28}
-  .phase-name{font-size:11px;letter-spacing:.05em;line-height:1.3}
+  .hero{text-align:center;margin-bottom:26px}
+  .hero h1{font-size:clamp(28px,8vw,42px);font-weight:400;letter-spacing:.16em;
+    text-shadow:0 0 22px rgba(231,200,115,.55);margin-bottom:8px}
+  .hero .sub{color:var(--gold-soft);font-size:13px;letter-spacing:.22em;opacity:.9}
 
-  button.cast{
-    margin-top:28px;width:100%;padding:16px;border:none;border-radius:999px;cursor:pointer;
-    font-family:inherit;font-size:17px;letter-spacing:.18em;color:#1a1405;
-    background:linear-gradient(90deg,#d9b65f,#f3e2af,#d9b65f);
-    box-shadow:0 6px 24px rgba(231,200,115,.5);transition:transform .2s, filter .2s;
-  }
-  button.cast:hover{transform:translateY(-2px);filter:brightness(1.08)}
-  button.cast:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.5)}
+  /* ヒーローの月 */
+  .hero-moon{width:104px;height:104px;margin:6px auto 18px;position:relative}
+  .moon-face{width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 36% 30%,#fffdf3,#ece6cf 52%,#b7b094 100%);
+    box-shadow:0 0 46px 8px rgba(246,231,182,.5),inset -12px -8px 26px rgba(0,0,0,.4);
+    animation:float 6s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  .moon-face .sh{position:absolute;top:-6%;height:112%;width:112%;border-radius:50%;
+    background:#0a0826;transition:left .6s ease;left:160%}
 
-  /* 演出オーバーレイ */
-  #overlay{
-    position:fixed;inset:0;z-index:50;display:none;
-    align-items:center;justify-content:center;flex-direction:column;
-    background:radial-gradient(ellipse at 50% 50%,rgba(28,28,68,.9),rgba(5,5,18,.98));
-    backdrop-filter:blur(2px);
-  }
-  #overlay.show{display:flex;animation:fadein .6s ease}
-  @keyframes fadein{from{opacity:0}to{opacity:1}}
-  .ritual-moon{
-    width:120px;height:120px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%,#fffdf2,#e9e4cf 55%,#b9b29a 100%);
-    box-shadow:0 0 80px 20px rgba(243,226,175,.7);
-    animation:pulse 1.6s ease-in-out infinite;
-  }
-  @keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 60px 12px rgba(243,226,175,.6)}50%{transform:scale(1.12);box-shadow:0 0 110px 30px rgba(243,226,175,.9)}}
-  .ritual-text{margin-top:34px;font-size:18px;letter-spacing:.3em;color:var(--gold-soft);min-height:26px}
-  .ring{
-    position:absolute;border:1px solid rgba(231,200,115,.4);border-radius:50%;
-    animation:expand 2.6s linear infinite;
-  }
-  @keyframes expand{from{width:120px;height:120px;opacity:.8}to{width:480px;height:480px;opacity:0}}
+  /* カード & ステップ */
+  .card{background:var(--card);border:1px solid rgba(231,200,115,.28);border-radius:20px;
+    padding:22px 18px;backdrop-filter:blur(6px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+  .step{margin-bottom:22px}
+  .step:last-of-type{margin-bottom:0}
+  .step-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .badge{flex:0 0 auto;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    font-size:13px;font-weight:700;color:#1a1405;
+    background:linear-gradient(135deg,#f4dd9a,#d9b65f);box-shadow:0 0 14px rgba(231,200,115,.55)}
+  .step-h .t{font-size:15px;letter-spacing:.06em;font-weight:600}
+  .step-h .t small{display:block;font-size:11px;color:#a9a3d6;font-weight:400;letter-spacing:.02em;margin-top:2px}
 
-  /* 結果 */
-  #result{margin-top:30px;display:none}
+  .selrow{display:flex;gap:8px;flex-wrap:wrap}
+  .selbox{position:relative;flex:1 1 0;min-width:0}
+  .selbox::after{content:"";position:absolute;right:12px;top:50%;width:0;height:0;pointer-events:none;
+    border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--gold-soft);
+    transform:translateY(-30%)}
+  .selbox .cap{position:absolute;top:-9px;left:10px;font-size:10px;color:#a9a3d6;background:#0c0a2a;padding:0 6px;border-radius:4px;letter-spacing:.04em}
+  select{width:100%;padding:15px 28px 15px 14px;border-radius:13px;font-size:17px;font-family:inherit;
+    color:var(--text);background:rgba(8,6,30,.7);border:1px solid rgba(231,200,115,.4);
+    appearance:none;-webkit-appearance:none;cursor:pointer;text-align:center;text-align-last:center}
+  select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(231,200,115,.18)}
+
+  .timerow{align-items:center}
+  .unknown{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:#cfc8f0;cursor:pointer;user-select:none}
+  .unknown input{width:18px;height:18px;accent-color:var(--gold)}
+  .muted{opacity:.4;pointer-events:none}
+
+  /* 自動判定の表示 */
+  .auto-card{margin-top:14px;border-radius:14px;padding:14px;text-align:center;
+    background:linear-gradient(180deg,rgba(138,123,255,.18),rgba(103,232,214,.08));
+    border:1px solid rgba(138,123,255,.45)}
+  .auto-card .mini-moon{width:54px;height:54px;border-radius:50%;margin:2px auto 8px;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 36% 30%,#fffdf3,#d9d3b8);box-shadow:0 0 18px rgba(246,231,182,.6)}
+  .auto-card .mini-moon i{position:absolute;top:-8%;height:116%;width:116%;border-radius:50%;background:#0a0826}
+  .auto-card .nm{font-size:17px;color:#fff;font-weight:700;letter-spacing:.05em}
+  .auto-card .dt{font-size:11px;color:#cfc8f0;margin-top:5px;letter-spacing:.02em}
+
+  /* 月相 手動グリッド */
+  .toggle-manual{margin-top:12px;text-align:center}
+  .toggle-manual button{background:none;border:none;color:var(--gold-soft);font-size:12px;
+    text-decoration:underline;cursor:pointer;font-family:inherit;letter-spacing:.04em;opacity:.85}
+  .phase-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;display:none}
+  .phase-grid.show{display:grid}
+  .pbtn{cursor:pointer;border:1px solid rgba(231,200,115,.3);border-radius:13px;background:rgba(255,255,255,.03);
+    padding:11px 4px 8px;transition:.2s;text-align:center}
+  .pbtn:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .pbtn.sel{border-color:var(--gold);background:rgba(231,200,115,.16);box-shadow:0 0 16px rgba(231,200,115,.4)}
+  .pico{width:36px;height:36px;border-radius:50%;margin:0 auto 6px;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 36% 30%,#fffdf3,#d2ccb0)}
+  .pico i{position:absolute;top:-10%;height:120%;width:120%;border-radius:50%;background:#0c0a28}
+  .pname{font-size:10.5px;letter-spacing:.02em}
+
+  /* 占うボタン */
+  .cast{margin-top:24px;width:100%;padding:18px;border:none;border-radius:999px;cursor:pointer;font-family:inherit;
+    font-size:18px;font-weight:700;letter-spacing:.2em;color:#1a1405;position:relative;overflow:hidden;
+    background:linear-gradient(90deg,#d9b65f,#f8ecbf,#d9b65f);box-shadow:0 8px 30px rgba(231,200,115,.5);
+    transition:transform .2s,filter .2s}
+  .cast:hover{transform:translateY(-2px);filter:brightness(1.06)}
+  .cast:disabled{opacity:.4;filter:grayscale(.5);cursor:not-allowed}
+  .cast .shine{position:absolute;top:0;left:-60%;width:40%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);
+    animation:shine 3.2s ease-in-out infinite}
+  @keyframes shine{0%{left:-60%}55%,100%{left:130%}}
+
+  .note{font-size:11px;opacity:.5;margin-top:24px;line-height:1.85;letter-spacing:.03em;text-align:center}
+
+  /* ====================== 演出オーバーレイ ====================== */
+  #overlay{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+    background:radial-gradient(ellipse at 50% 50%,#1a1450 0%,#0a0726 45%,#020010 100%)}
+  #overlay.show{display:flex}
+  .aurora{position:absolute;inset:-20%;pointer-events:none;mix-blend-mode:screen;opacity:.6;
+    background:
+      radial-gradient(400px 300px at 30% 30%,rgba(138,123,255,.55),transparent 60%),
+      radial-gradient(420px 320px at 70% 60%,rgba(103,232,214,.45),transparent 60%),
+      radial-gradient(380px 280px at 50% 80%,rgba(231,200,115,.4),transparent 60%);
+    animation:swirl 8s linear infinite}
+  @keyframes swirl{0%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(1.15)}100%{transform:rotate(360deg) scale(1)}}
+
+  .ov-stage{position:relative;width:300px;height:300px;display:grid;place-items:center}
+  /* 回転する星座リング */
+  .zring{position:absolute;width:290px;height:290px;border-radius:50%;
+    animation:spin 18s linear infinite}
+  .zring.r2{width:230px;height:230px;animation:spin 26s linear infinite reverse;opacity:.6}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .zglyph{position:absolute;left:50%;top:50%;font-size:18px;color:var(--gold-soft);
+    text-shadow:0 0 10px rgba(231,200,115,.8);transform-origin:0 0}
+  .zring::before{content:"";position:absolute;inset:0;border-radius:50%;
+    border:1px solid rgba(231,200,115,.25);box-shadow:0 0 30px rgba(231,200,115,.25) inset}
+
+  /* 満ち欠けする月 */
+  .ov-moon{width:140px;height:140px;border-radius:50%;position:relative;overflow:hidden;z-index:3;
+    background:radial-gradient(circle at 36% 30%,#fffef6,#efe9d2 50%,#c9c2a6 100%);
+    box-shadow:0 0 70px 16px rgba(246,231,182,.75);animation:moonpulse 2.4s ease-in-out infinite}
+  @keyframes moonpulse{0%,100%{box-shadow:0 0 50px 10px rgba(246,231,182,.6)}50%{box-shadow:0 0 110px 26px rgba(246,231,182,.95)}}
+  .ov-moon .term{position:absolute;top:-8%;height:116%;width:116%;border-radius:50%;
+    background:radial-gradient(circle at 50% 50%,#0d0a2e,#070420);
+    animation:phasecycle 3s ease-in-out infinite}
+  @keyframes phasecycle{
+    0%{left:-6%}      /* 新月：覆う */
+    25%{left:62%}     /* 半月 */
+    50%{left:150%}    /* 満月：外へ */
+    75%{left:62%}     /* 半月 */
+    100%{left:-6%}    /* 新月へ */
+  }
+  /* 広がる輪 */
+  .ring{position:absolute;border:1px solid rgba(231,200,115,.45);border-radius:50%;z-index:2;
+    animation:expand 2.6s linear infinite}
+  @keyframes expand{from{width:140px;height:140px;opacity:.8}to{width:520px;height:520px;opacity:0}}
+
+  /* 流れ星 */
+  .shoot{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;
+    box-shadow:0 0 8px 2px #fff;opacity:0}
+  .shoot::after{content:"";position:absolute;right:0;top:50%;width:120px;height:1px;
+    background:linear-gradient(90deg,rgba(255,255,255,.9),transparent);transform:translateY(-50%)}
+  @keyframes shootmove{0%{opacity:0;transform:translate(0,0) rotate(18deg)}
+    8%{opacity:1}40%{opacity:1}100%{opacity:0;transform:translate(-340px,160px) rotate(18deg)}}
+
+  /* きらめき粒子 */
+  .spark{position:absolute;width:6px;height:6px;pointer-events:none;
+    background:radial-gradient(circle,#fff,transparent 70%);animation:sparkle 1.8s ease-in-out infinite}
+  @keyframes sparkle{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.3)}}
+
+  .ov-text{position:absolute;bottom:14%;left:0;right:0;text-align:center;z-index:5;padding:0 24px}
+  .ov-text .line{font-family:"Hiragino Mincho ProN",serif;font-size:18px;letter-spacing:.22em;
+    color:#fff;text-shadow:0 0 16px rgba(231,200,115,.8);min-height:28px;
+    opacity:0;transition:opacity .5s}
+  .ov-text .line.on{opacity:1}
+  .ov-prog{position:absolute;bottom:9%;left:50%;transform:translateX(-50%);width:160px;height:3px;
+    background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden;z-index:5}
+  .ov-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),#fff)}
+
+  .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:9}
+  .flash.fire{animation:flash .9s ease-out}
+  @keyframes flash{0%{opacity:0}18%{opacity:.95}100%{opacity:0}}
+
+  /* ====================== 結果 ====================== */
+  #result{margin-top:26px;display:none}
   #result.show{display:block;animation:rise 1s ease}
-  @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-  .sign-title{font-size:24px;letter-spacing:.12em;color:var(--gold);text-shadow:0 0 14px rgba(231,200,115,.5);margin-bottom:4px}
-  .sign-sub{font-size:13px;color:var(--gold-soft);letter-spacing:.2em;margin-bottom:18px;opacity:.85}
-  .reading{text-align:left;line-height:2;font-size:15px}
-  .reading h3{color:var(--gold-soft);font-size:14px;letter-spacing:.1em;margin:18px 0 4px;border-left:3px solid var(--gold);padding-left:10px}
-  .keyword{display:inline-block;margin:4px 6px 0 0;padding:5px 12px;border:1px solid rgba(231,200,115,.4);border-radius:999px;font-size:12px;color:var(--gold-soft)}
-  .again{margin-top:26px;background:none;border:1px solid rgba(231,200,115,.5);color:var(--gold-soft);
-    padding:11px 26px;border-radius:999px;cursor:pointer;font-family:inherit;letter-spacing:.1em;font-size:13px}
+  @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+  .res-moon{width:88px;height:88px;border-radius:50%;margin:2px auto 14px;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 36% 30%,#fffdf3,#ece6cf 52%,#b7b094);box-shadow:0 0 36px rgba(246,231,182,.6)}
+  .res-moon i{position:absolute;top:-8%;height:116%;width:116%;border-radius:50%;background:#0a0826}
+  .sign-title{font-family:"Hiragino Mincho ProN",serif;font-size:25px;letter-spacing:.1em;color:var(--gold);
+    text-shadow:0 0 16px rgba(231,200,115,.5);text-align:center;margin-bottom:4px}
+  .sign-sub{font-size:12.5px;color:var(--gold-soft);letter-spacing:.14em;text-align:center;margin-bottom:16px;opacity:.9}
+  .kws{text-align:center;margin-bottom:6px}
+  .keyword{display:inline-block;margin:4px 5px 0 0;padding:5px 13px;border:1px solid rgba(231,200,115,.45);
+    border-radius:999px;font-size:12px;color:var(--gold-soft)}
+  .reading{text-align:left;line-height:2;font-size:15px;margin-top:6px}
+  .reading h3{font-family:"Hiragino Mincho ProN",serif;color:var(--gold-soft);font-size:15px;letter-spacing:.08em;
+    margin:20px 0 6px;border-left:3px solid var(--gold);padding-left:11px}
+
+  .promo{margin-top:26px;padding:22px 18px;border-radius:18px;text-align:center;
+    background:linear-gradient(180deg,rgba(6,199,85,.18),rgba(6,199,85,.06));border:1px solid rgba(6,199,85,.5)}
+  .promo .pt{font-size:16px;letter-spacing:.03em;line-height:1.7;color:#eafff0;font-weight:700}
+  .promo .ps{font-size:12.5px;color:#bfe9cc;margin-top:8px;line-height:1.8}
+  .line-btn{display:inline-flex;align-items:center;gap:9px;margin-top:15px;padding:14px 28px;border-radius:999px;
+    text-decoration:none;background:var(--line);color:#fff;font-weight:700;font-size:15.5px;letter-spacing:.04em;
+    box-shadow:0 8px 24px rgba(6,199,85,.5);transition:transform .2s,filter .2s}
+  .line-btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
+  .line-ico{width:24px;height:24px;background:#fff;border-radius:7px;color:var(--line);display:inline-flex;
+    align-items:center;justify-content:center;font-weight:800;font-size:14px;font-family:Arial,sans-serif}
+
+  .again{margin-top:24px;width:100%;background:none;border:1px solid rgba(231,200,115,.5);color:var(--gold-soft);
+    padding:14px;border-radius:999px;cursor:pointer;font-family:inherit;letter-spacing:.1em;font-size:14px}
   .again:hover{background:rgba(231,200,115,.12)}
-  .note{font-size:11px;opacity:.5;margin-top:26px;letter-spacing:.05em;line-height:1.8}
 
-  /* ===== LINE宣伝(PR)ブロック ===== */
-  .promo{
-    margin-top:24px;padding:20px 18px;border-radius:16px;text-align:center;
-    background:linear-gradient(180deg,rgba(6,199,85,.16),rgba(6,199,85,.06));
-    border:1px solid rgba(6,199,85,.5);
+  @media (max-width:380px){
+    select{font-size:16px;padding:13px 26px 13px 12px}
+    .phase-grid{gap:6px}.pname{font-size:9.5px}
+    .ov-stage{width:260px;height:260px}
   }
-  .promo .pt{font-size:15px;letter-spacing:.04em;line-height:1.7;color:#eafff0}
-  .promo .ps{font-size:12px;color:#bfe9cc;margin-top:6px;line-height:1.7}
-  .line-btn{
-    display:inline-flex;align-items:center;gap:8px;margin-top:14px;
-    padding:13px 26px;border-radius:999px;text-decoration:none;
-    background:#06c755;color:#fff;font-weight:700;font-size:15px;letter-spacing:.05em;
-    box-shadow:0 6px 20px rgba(6,199,85,.45);transition:transform .2s,filter .2s;
-  }
-  .line-btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
-  .line-ico{width:22px;height:22px;background:#fff;border-radius:6px;color:#06c755;
-    display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-family:Arial,sans-serif}
-
-  /* ===== スマホ最適化 ===== */
-  @media (max-width:480px){
-    .wrap{padding:34px 14px 64px}
-    h1{letter-spacing:.12em}
-    .sub{letter-spacing:.12em;font-size:12px;margin-bottom:26px}
-    .card{padding:20px 15px;border-radius:15px}
-    .moon-stage{width:112px;height:112px;margin-bottom:22px}
-    .phase-grid{gap:7px}
-    .phase-btn{padding:9px 3px 7px;border-radius:10px}
-    .phase-ico{width:34px;height:34px;margin-bottom:5px}
-    .phase-name{font-size:10px;letter-spacing:0}
-    button.cast{font-size:16px;letter-spacing:.12em;padding:15px}
-    .reading{font-size:14.5px;line-height:1.95}
-    .sign-title{font-size:21px}
-    .ritual-text{font-size:15px;letter-spacing:.18em;padding:0 18px}
-    .ring{animation-name:expandSm}
-  }
-  @keyframes expandSm{from{width:100px;height:100px;opacity:.8}to{width:300px;height:300px;opacity:0}}
-  /* 小さめ端末で月相を2行に収める保険 */
-  @media (max-width:340px){
-    .phase-grid{grid-template-columns:repeat(4,1fr);gap:5px}
-    .phase-name{font-size:9px}
-  }
-  /* 動きを減らす設定の人への配慮 */
   @media (prefers-reduced-motion:reduce){
-    .moon,.ritual-moon,.star{animation:none}
+    .moon-face,.ov-moon,.star,.aurora,.zring,.ov-moon .term{animation:none!important}
   }
 </style>
 </head>
 <body>
 <div id="stars"></div>
-<div id="stars2"></div>
 
 <div class="wrap">
-  <h1>月 の 占 い</h1>
-  <div class="sub">― あなたの本当の心、月星座が語る ―</div>
-
-  <div class="moon-stage"><div class="moon"><div class="shadow" id="bigShadow"></div></div></div>
+  <div class="hero">
+    <div class="hero-moon"><div class="moon-face"><div class="sh" id="heroShadow"></div></div></div>
+    <h1 class="serif">月 の 占 い</h1>
+    <div class="sub">― あなたの本当の心を、月星座が映し出す ―</div>
+  </div>
 
   <div class="card" id="inputCard">
-    <label for="bday">生まれた日（生年月日）</label>
-    <input type="date" id="bday" min="1900-01-01" max="2099-12-31" value="2000-01-01">
-
-    <div class="row2">
-      <div>
-        <label for="btime">生まれた時間 <span class="opt">（任意）</span></label>
-        <input type="time" id="btime" value="12:00">
-      </div>
-      <div>
-        <label for="bplace">生まれた場所</label>
-        <select id="bplace"></select>
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-h"><div class="badge">1</div><div class="t">生まれた日<small>プルダウンから選ぶだけ</small></div></div>
+      <div class="selrow">
+        <div class="selbox"><span class="cap">年</span><select id="selY"></select></div>
+        <div class="selbox"><span class="cap">月</span><select id="selM"></select></div>
+        <div class="selbox"><span class="cap">日</span><select id="selD"></select></div>
       </div>
     </div>
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-h"><div class="badge">2</div><div class="t">生まれた時間<small>わからなければチェックでOK</small></div></div>
+      <div class="selrow timerow" id="timeRow">
+        <div class="selbox"><span class="cap">時</span><select id="selH"></select></div>
+        <div class="selbox"><span class="cap">分</span><select id="selMin"></select></div>
+      </div>
+      <label class="unknown"><input type="checkbox" id="noTime">出生時間がわからない（お昼ごろで計算します）</label>
+    </div>
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-h"><div class="badge">3</div><div class="t">生まれた場所<small>都道府県ごとに月を繊細に計算</small></div></div>
+      <div class="selbox"><span class="cap">都道府県</span><select id="selPref"></select></div>
+    </div>
+    <!-- STEP 4 自動判定 -->
+    <div class="step">
+      <div class="step-h"><div class="badge">4</div><div class="t">生まれた夜の月の形<small>入力すると自動で見つけます</small></div></div>
+      <div class="auto-card" id="autoCard">
+        <div class="mini-moon"><i id="autoMoonShadow"></i></div>
+        <div class="nm" id="autoName">―</div>
+        <div class="dt" id="autoDt">生年月日を選ぶと表示されます</div>
+      </div>
+      <div class="toggle-manual"><button type="button" id="manualToggle">自分で月の形を選び直す ▾</button></div>
+      <div class="phase-grid" id="phaseGrid"></div>
+    </div>
 
-    <button class="auto" id="autoBtn" type="button">🌙 生まれた時の月の形を自動で調べる</button>
-    <div class="auto-result" id="autoResult"></div>
-
-    <label>生まれたときの月の形 <span class="opt">（自動判定 または 手動で選択）</span></label>
-    <div class="phase-grid" id="phaseGrid"></div>
-
-    <button class="cast" id="castBtn" disabled>月に問う</button>
+    <button class="cast" id="castBtn" disabled><span class="shine"></span>月 に 問 う</button>
   </div>
 
   <div id="result"></div>
 
   <div class="note">
-    マドモアゼル愛先生の「月星座」の考え方を参考にした、エンターテインメント占いです。<br>
-    月星座・月の満ち欠けは、生まれた日・時間・場所から概算で算出しています<br>
-    （時間が不明な場合はお昼として計算します。境界の前後では多少ずれることがあります）。
+    マドモアゼル愛先生の「月星座」の考え方を参考にしたエンターテインメント占いです。<br>
+    月星座・月の満ち欠けは、生まれた日・時間・都道府県（経度補正）から概算しています。<br>
+    境界の前後ではずれることがあります。
   </div>
 </div>
 
+<!-- 演出オーバーレイ -->
 <div id="overlay">
-  <div class="ring"></div><div class="ring" style="animation-delay:.8s"></div><div class="ring" style="animation-delay:1.6s"></div>
-  <div class="ritual-moon"></div>
-  <div class="ritual-text" id="ritualText"></div>
+  <div class="aurora"></div>
+  <div class="ov-stage">
+    <div class="zring" id="zring1"></div>
+    <div class="zring r2" id="zring2"></div>
+    <div class="ring"></div><div class="ring" style="animation-delay:.9s"></div><div class="ring" style="animation-delay:1.8s"></div>
+    <div class="ov-moon"><div class="term"></div></div>
+  </div>
+  <div class="ov-text" id="ovText"><div class="line" id="ovLine"></div></div>
+  <div class="ov-prog"><i id="ovBar"></i></div>
+  <div class="flash" id="flash"></div>
 </div>
 
 <script>
 /* ============================================================
-   ▼▼▼ マドモアゼル愛先生 LINE のURL（ここを差し替えてください）▼▼▼
-   LINE公式アカウントの「友だち追加」URL（例: https://lin.ee/xxxxxxx）に変更すると
-   結果画面の緑のボタンがそのアカウントにつながります。
+   ▼ マドモアゼル愛先生 LINE（友だち追加URL）
    ============================================================ */
-const LINE_URL = "https://lin.ee/your-line-id"; // ←ここを本物のURLに差し替え
+const LINE_URL = "https://mademoiselle-ai.com/login";
 const LINE_NAME = "マドモアゼル愛先生";
 
-/* ========== 生まれた場所（タイムゾーン）========== */
-/* 月の満ち欠けは「生まれた日時」で決まり、場所は時差(UTCとのズレ)の補正に使います */
-const PLACES=[
-  {n:'日本（東京・大阪など）',tz:9},
-  {n:'韓国（ソウル）',tz:9},
-  {n:'台湾（台北）',tz:8},
-  {n:'中国（北京・上海）',tz:8},
-  {n:'タイ（バンコク）',tz:7},
-  {n:'ハワイ（ホノルル）',tz:-10},
-  {n:'アメリカ西海岸（ロサンゼルス）',tz:-8},
-  {n:'アメリカ東海岸（ニューヨーク）',tz:-5},
-  {n:'イギリス（ロンドン）',tz:0},
-  {n:'フランス・ドイツ（パリ・ベルリン）',tz:1},
-  {n:'オーストラリア東部（シドニー）',tz:10},
+/* ========== 都道府県（県庁所在地のおおよその経度）==========
+   日本は標準時 +9（東経135度基準）。県庁所在地の経度で地方時補正をかけ、
+   都道府県ごとに月の位置をわずかに変えて計算します。 */
+const PREFS=[
+ ['北海道',141.35],['青森県',140.74],['岩手県',141.15],['宮城県',140.87],['秋田県',140.10],
+ ['山形県',140.36],['福島県',140.47],['茨城県',140.45],['栃木県',139.88],['群馬県',139.06],
+ ['埼玉県',139.65],['千葉県',140.12],['東京都',139.69],['神奈川県',139.64],['新潟県',139.02],
+ ['富山県',137.21],['石川県',136.63],['福井県',136.22],['山梨県',138.57],['長野県',138.18],
+ ['岐阜県',136.72],['静岡県',138.38],['愛知県',136.91],['三重県',136.51],['滋賀県',135.87],
+ ['京都府',135.76],['大阪府',135.52],['兵庫県',135.18],['奈良県',135.83],['和歌山県',135.17],
+ ['鳥取県',134.24],['島根県',133.05],['岡山県',133.93],['広島県',132.46],['山口県',131.47],
+ ['徳島県',134.56],['香川県',134.04],['愛媛県',132.77],['高知県',133.53],['福岡県',130.42],
+ ['佐賀県',130.30],['長崎県',129.87],['熊本県',130.74],['大分県',131.61],['宮崎県',131.42],
+ ['鹿児島県',130.56],['沖縄県',127.68],
+];
+
+/* ========== 月相データ（並び＝離角の順）========== */
+const PHASES=[
+  {key:'new',  name:'新月',     shLeft:'5%'},
+  {key:'waxc', name:'三日月',   shLeft:'52%'},
+  {key:'firstq',name:'上弦の月', shLeft:'62%'},
+  {key:'waxg', name:'満ちゆく月',shLeft:'90%'},
+  {key:'full', name:'満月',     shLeft:'160%'},
+  {key:'wang', name:'欠けゆく月',shLeft:'-40%'},
+  {key:'lastq',name:'下弦の月', shLeft:'-12%'},
+  {key:'wanc', name:'有明の月', shLeft:'2%'},
 ];
 
 /* ========== 星空生成 ========== */
-function makeStars(id,count){
-  const c=document.getElementById(id);
-  for(let i=0;i<count;i++){
-    const s=document.createElement('div');s.className='star';
-    const sz=Math.random()*2+1;
-    s.style.width=s.style.height=sz+'px';
-    s.style.left=Math.random()*100+'%';
-    s.style.top=Math.random()*100+'%';
-    s.style.setProperty('--dur',(Math.random()*4+2)+'s');
-    s.style.animationDelay=(Math.random()*4)+'s';
-    c.appendChild(s);
-  }
+(function(){const c=document.getElementById('stars');for(let i=0;i<120;i++){const s=document.createElement('div');
+  s.className='star';const z=Math.random()*2+1;s.style.width=s.style.height=z+'px';
+  s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+  s.style.setProperty('--d',(Math.random()*4+2)+'s');s.style.animationDelay=(Math.random()*4)+'s';c.appendChild(s);}})();
+
+/* ========== 入力UI生成 ========== */
+const $=id=>document.getElementById(id);
+const selY=$('selY'),selM=$('selM'),selD=$('selD'),selH=$('selH'),selMin=$('selMin'),selPref=$('selPref');
+function opt(sel,val,label){const o=document.createElement('option');o.value=val;o.textContent=label;sel.appendChild(o);}
+for(let y=2025;y>=1925;y--) opt(selY,y,y+'年');
+for(let m=1;m<=12;m++) opt(selM,m,m+'月');
+for(let h=0;h<=23;h++) opt(selH,h,h+'時');
+for(let mi=0;mi<60;mi+=5) opt(selMin,mi,('0'+mi).slice(-2)+'分');
+PREFS.forEach((p,i)=>opt(selPref,i,p[0]));
+selY.value=2000;selM.value=1;selH.value=12;selMin.value=0;selPref.value=12; // 既定:東京
+
+function rebuildDays(){
+  const y=+selY.value,m=+selM.value,cur=+selD.value||1;
+  const dim=new Date(y,m,0).getDate();
+  selD.innerHTML='';for(let d=1;d<=dim;d++) opt(selD,d,d+'日');
+  selD.value=Math.min(cur,dim);
 }
-makeStars('stars',90);makeStars('stars2',50);
+rebuildDays();
 
-/* ========== 月相データ（生まれたときの月の形） ========== */
-/* offset:影の位置(0=満月 / ±で欠ける), 影の幅イメージ */
-const PHASES=[
-  {key:'new',     name:'新月',   shadow:0,   light:'はじまりと種まきの月'},
-  {key:'waxc',    name:'三日月', shadow:62,  light:'芽生え・好奇心の月'},
-  {key:'firstq',  name:'上弦の月', shadow:50, light:'決断と行動の月'},
-  {key:'waxg',    name:'満ちゆく月', shadow:30, light:'成長と挑戦の月'},
-  {key:'full',    name:'満月',   shadow:-200,light:'完成と感情があふれる月'},
-  {key:'wang',    name:'欠けゆく月', shadow:-30,light:'成熟と共有の月'},
-  {key:'lastq',   name:'下弦の月', shadow:-50,light:'手放しと内省の月'},
-  {key:'wanc',    name:'有明の月', shadow:-62,light:'浄化と次への準備の月'},
-];
+/* 月相 手動グリッド */
+const phaseGrid=$('phaseGrid');let selPhase=null;
+PHASES.forEach((p,idx)=>{const b=document.createElement('div');b.className='pbtn';b.dataset.idx=idx;
+  b.innerHTML=`<div class="pico"><i style="left:${p.shLeft}"></i></div><div class="pname">${p.name}</div>`;
+  b.onclick=()=>{setPhase(idx,true);};phaseGrid.appendChild(b);});
+$('manualToggle').onclick=()=>{phaseGrid.classList.toggle('show');
+  $('manualToggle').textContent=phaseGrid.classList.contains('show')?'閉じる ▴':'自分で月の形を選び直す ▾';};
 
-const phaseGrid=document.getElementById('phaseGrid');
-let selPhase=null;
-PHASES.forEach((p,idx)=>{
-  const b=document.createElement('div');b.className='phase-btn';b.dataset.idx=idx;
-  // アイコンの影位置
-  let shLeft;
-  if(p.shadow<=-100) shLeft='150%';            // 満月：影を外へ
-  else if(p.shadow===0) shLeft='-10%';         // 新月：影で覆う … 後で調整
-  else shLeft=null;
-  b.innerHTML=`<div class="phase-ico"><i style="left:${iconShadowLeft(p)}"></i></div><div class="phase-name">${p.name}</div>`;
-  b.onclick=()=>selectPhase(idx,b);
-  phaseGrid.appendChild(b);
-});
-
-function iconShadowLeft(p){
-  // 新月=ほぼ全部影 / 満月=影なし / その間
-  if(p.key==='new') return '8%';
-  if(p.key==='full') return '160%';
-  if(p.shadow>0) return (p.shadow-10)+'%';   // 満ちる側：右に影
-  return (-110-p.shadow)+'%';                 // 欠ける側：左に影
+function setPhase(idx,manual){
+  selPhase=idx;const p=PHASES[idx];
+  document.querySelectorAll('.pbtn').forEach((x,i)=>x.classList.toggle('sel',i===idx));
+  $('autoMoonShadow').style.left=p.shLeft;
+  $('heroShadow').style.left=p.shLeft;
+  $('autoName').textContent=p.name;
+  $('castBtn').disabled=false;
+  if(manual){$('autoDt').textContent='（手動で選択中）';}
 }
 
-function selectPhase(idx,el){
-  selPhase=idx;
-  document.querySelectorAll('.phase-btn').forEach(x=>x.classList.remove('sel'));
-  el.classList.add('sel');
-  // 大きな月にも反映
-  const p=PHASES[idx];
-  document.getElementById('bigShadow').style.left=iconShadowLeft(p);
-  checkReady();
-}
-
-const bday=document.getElementById('bday');
-const btime=document.getElementById('btime');
-const bplace=document.getElementById('bplace');
-const castBtn=document.getElementById('castBtn');
-const autoBtn=document.getElementById('autoBtn');
-const autoResult=document.getElementById('autoResult');
-
-// 場所の選択肢を生成
-PLACES.forEach((pl,idx)=>{
-  const o=document.createElement('option');o.value=idx;o.textContent=pl.n;bplace.appendChild(o);
-});
-bplace.value=0; // 既定: 日本
-
-bday.addEventListener('change',checkReady);
-function checkReady(){castBtn.disabled=!(bday.value && selPhase!==null);}
-
-// 生まれた時の月の形を自動判定
-autoBtn.addEventListener('click',()=>{
-  if(!bday.value){autoResult.className='auto-result on';autoResult.textContent='先に「生まれた日」を入力してください。';return;}
-  const tz=PLACES[+bplace.value].tz;
-  const dayNum=dayNumFromInputs(bday.value,btime.value,tz);
-  const phaseIdx=moonPhaseFromDayNum(dayNum);
-  // グリッドの該当ボタンを選択
-  const el=phaseGrid.querySelector(`[data-idx="${phaseIdx}"]`);
-  selectPhase(phaseIdx,el);
-  autoResult.className='auto-result on';
-  const t=btime.value?`${btime.value}頃`:'時間未入力';
-  autoResult.innerHTML=`✨ あなたが生まれた夜の月は <b style="color:#fff">「${PHASES[phaseIdx].name}」</b> でした<br><span style="opacity:.75;font-size:12px">（${bday.value} ${t} / ${PLACES[+bplace.value].n.replace(/（.*）/,'')}）</span>`;
-});
-
-/* ========== 太陽・月の黄経の概算計算 ========== */
-/* Paul Schlyter の簡易式 + 主要摂動項 */
+/* ========== 天文計算（Schlyter簡易式＋主要摂動）========== */
 const RAD=Math.PI/180, rev=x=>((x%360)+360)%360;
-
-/* 入力(日付・時間・場所のタイムゾーン)から元期2000 Jan 0.0(UT)基準の日数を得る */
-function dayNumFromInputs(dateStr,timeStr,tz){
-  const [y,mo,da]=dateStr.split('-').map(Number);
-  const [hh,mi]=(timeStr||'12:00').split(':').map(Number);
-  const utcMs=Date.UTC(y,mo-1,da,hh,mi)-tz*3600000; // 現地時刻→UTCへ
-  return utcMs/86400000 - 10956.0;
+/* 入力（年月日時分＋経度の地方時補正）→ 元期2000 Jan 0.0(UT)基準の日数 */
+function dayNumFromInputs(y,mo,da,hh,mi,lon){
+  const ms=Date.UTC(y,mo-1,da,hh,mi)-(lon/15)*3600000; // 経度から地方時→UTへ
+  return ms/86400000 - 10956.0;
 }
-
-/* 太陽の黄経 */
-function sunLongitude(dayNum){
-  const w=282.9404+4.70935e-5*dayNum;
-  const e=0.016709-1.151e-9*dayNum;
-  const M=rev(356.0470+0.9856002585*dayNum);
-  let E=M+(180/Math.PI)*e*Math.sin(M*RAD)*(1+e*Math.cos(M*RAD));
+function sunLongitude(d){
+  const w=282.9404+4.70935e-5*d, e=0.016709-1.151e-9*d, M=rev(356.0470+0.9856002585*d);
+  const E=M+(180/Math.PI)*e*Math.sin(M*RAD)*(1+e*Math.cos(M*RAD));
   const xv=Math.cos(E*RAD)-e, yv=Math.sqrt(1-e*e)*Math.sin(E*RAD);
-  const v=rev((180/Math.PI)*Math.atan2(yv,xv));
-  return rev(v+w);
+  return rev((180/Math.PI)*Math.atan2(yv,xv)+w);
 }
-
-/* 月の黄経 */
-function moonLongitude(dayNum){
-  let N=rev(125.1228-0.0529538083*dayNum);
-  const i=5.1454;
-  const w=318.0634+0.1643573223*dayNum;
-  let M=rev(115.3654+13.0649929509*dayNum);
-  const e=0.054900,a=60.2666;
-  let Ms=rev(356.0470+0.9856002585*dayNum);
-  const ws=282.9404+4.70935e-5*dayNum;
+function moonLongitude(d){
+  let N=rev(125.1228-0.0529538083*d);const i=5.1454;const w=318.0634+0.1643573223*d;
+  let M=rev(115.3654+13.0649929509*d);const e=0.0549,a=60.2666;
+  let Ms=rev(356.0470+0.9856002585*d);const ws=282.9404+4.70935e-5*d;
   let E=M+(180/Math.PI)*e*Math.sin(M*RAD)*(1+e*Math.cos(M*RAD));
-  for(let k=0;k<6;k++){
-    E=E-(E-(180/Math.PI)*e*Math.sin(E*RAD)-M)/(1-e*Math.cos(E*RAD));
-  }
-  const xv=a*(Math.cos(E*RAD)-e);
-  const yv=a*Math.sqrt(1-e*e)*Math.sin(E*RAD);
-  const v=rev((180/Math.PI)*Math.atan2(yv,xv));
-  const r=Math.sqrt(xv*xv+yv*yv);
+  for(let k=0;k<6;k++){E=E-(E-(180/Math.PI)*e*Math.sin(E*RAD)-M)/(1-e*Math.cos(E*RAD));}
+  const xv=a*(Math.cos(E*RAD)-e), yv=a*Math.sqrt(1-e*e)*Math.sin(E*RAD);
+  const v=rev((180/Math.PI)*Math.atan2(yv,xv)), r=Math.sqrt(xv*xv+yv*yv);
   const xh=r*(Math.cos(N*RAD)*Math.cos((v+w)*RAD)-Math.sin(N*RAD)*Math.sin((v+w)*RAD)*Math.cos(i*RAD));
   const yh=r*(Math.sin(N*RAD)*Math.cos((v+w)*RAD)+Math.cos(N*RAD)*Math.sin((v+w)*RAD)*Math.cos(i*RAD));
   let lon=rev((180/Math.PI)*Math.atan2(yh,xh));
   const Lm=rev(N+w+M), Ls=rev(Ms+ws), Dm=rev(Lm-Ls), F=rev(Lm-N);
-  lon+= -1.274*Math.sin((M-2*Dm)*RAD)
-        +0.658*Math.sin(2*Dm*RAD)
-        -0.186*Math.sin(Ms*RAD)
-        -0.059*Math.sin((2*M-2*Dm)*RAD)
-        -0.057*Math.sin((M-2*Dm+Ms)*RAD)
-        +0.053*Math.sin((M+2*Dm)*RAD)
-        +0.046*Math.sin((2*Dm-Ms)*RAD)
-        +0.041*Math.sin((M-Ms)*RAD)
-        -0.035*Math.sin(Dm*RAD)
-        -0.031*Math.sin((M+Ms)*RAD)
-        -0.015*Math.sin((2*F-2*Dm)*RAD)
-        +0.011*Math.sin((M-4*Dm)*RAD);
+  lon+= -1.274*Math.sin((M-2*Dm)*RAD)+0.658*Math.sin(2*Dm*RAD)-0.186*Math.sin(Ms*RAD)
+        -0.059*Math.sin((2*M-2*Dm)*RAD)-0.057*Math.sin((M-2*Dm+Ms)*RAD)+0.053*Math.sin((M+2*Dm)*RAD)
+        +0.046*Math.sin((2*Dm-Ms)*RAD)+0.041*Math.sin((M-Ms)*RAD)-0.035*Math.sin(Dm*RAD)
+        -0.031*Math.sin((M+Ms)*RAD)-0.015*Math.sin((2*F-2*Dm)*RAD)+0.011*Math.sin((M-4*Dm)*RAD);
   return rev(lon);
 }
+function currentDayNum(){
+  const noTime=$('noTime').checked;
+  const hh=noTime?12:(+selH.value), mi=noTime?0:(+selMin.value);
+  const lon=PREFS[+selPref.value][1];
+  return dayNumFromInputs(+selY.value,+selM.value,+selD.value,hh,mi,lon);
+}
+function moonSignIdx(d){return Math.floor(moonLongitude(d)/30);}
+function moonPhaseIdx(d){const D=rev(moonLongitude(d)-sunLongitude(d));return Math.floor(rev(D+22.5)/45);}
 
-/* 月星座(0..11) */
-function moonSignFromDayNum(dayNum){ return Math.floor(moonLongitude(dayNum)/30); }
+/* ========== 自動判定 ========== */
+function autoDetect(){
+  const d=currentDayNum();
+  const idx=moonPhaseIdx(d);
+  setPhase(idx,false);
+  const noTime=$('noTime').checked;
+  const t=noTime?'お昼ごろ':`${selH.value}時${('0'+selMin.value).slice(-2)}分ごろ`;
+  $('autoDt').textContent=`${selY.value}年${selM.value}月${selD.value}日 ${t} / ${PREFS[+selPref.value][0]}`;
+}
+[selY,selM].forEach(s=>s.addEventListener('change',()=>{rebuildDays();autoDetect();}));
+[selD,selH,selMin,selPref].forEach(s=>s.addEventListener('change',autoDetect));
+$('noTime').addEventListener('change',()=>{$('timeRow').classList.toggle('muted',$('noTime').checked);autoDetect();});
+autoDetect(); // 初期表示
 
-/* 月相(0..7)を月と太陽の離角から判定。PHASES配列の並びに対応 */
-function moonPhaseFromDayNum(dayNum){
-  const D=rev(moonLongitude(dayNum)-sunLongitude(dayNum)); // 0=新月,90=上弦,180=満月,270=下弦
-  return Math.floor((rev(D+22.5))/45); // 0..7
+/* ========== 演出 ========== */
+// 星座リングのグリフ配置
+(function(){
+  const glyphs=['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+  [['zring1',135],['zring2',105]].forEach(([id,rad])=>{
+    const ring=$(id);glyphs.forEach((g,i)=>{const e=document.createElement('div');e.className='zglyph';
+      const a=(i/12)*Math.PI*2;e.textContent=g;
+      e.style.transform=`translate(${Math.cos(a)*rad}px,${Math.sin(a)*rad}px) rotate(${a+Math.PI/2}rad)`;
+      ring.appendChild(e);});});
+})();
+
+const overlay=$('overlay'),ovLine=$('ovLine'),ovBar=$('ovBar'),flash=$('flash'),resultEl=$('result');
+let shootTimer=null;
+function spawnShoot(){
+  const s=document.createElement('div');s.className='shoot';
+  s.style.left=(40+Math.random()*55)+'%';s.style.top=(8+Math.random()*30)+'%';
+  s.style.animation='shootmove 1.1s ease-out forwards';overlay.appendChild(s);
+  setTimeout(()=>s.remove(),1200);
+}
+function spawnSpark(){
+  const s=document.createElement('div');s.className='spark';
+  s.style.left=(15+Math.random()*70)+'%';s.style.top=(20+Math.random()*55)+'%';
+  s.style.animationDelay=(Math.random()*.6)+'s';overlay.appendChild(s);
+  setTimeout(()=>s.remove(),1800);
+}
+
+$('castBtn').addEventListener('click',runRitual);
+function runRitual(){
+  const lines=[
+    '星々が、ゆっくりと動きはじめました…',
+    'あなたが生まれた夜空を、再現しています…',
+    '月が満ち、そして欠けてゆく…',
+    'あなたの心の奥が、照らし出されます…',
+    'まもなく、月からのお告げが届きます…',
+  ];
+  overlay.classList.add('show');resultEl.classList.remove('show');
+  flash.classList.remove('fire');
+  ovBar.style.transition='none';ovBar.style.width='0%';
+  const DUR=5400;
+  requestAnimationFrame(()=>{ovBar.style.transition=`width ${DUR}ms linear`;ovBar.style.width='100%';});
+  // テキスト切り替え
+  let i=0;ovLine.textContent=lines[0];ovLine.classList.add('on');
+  const step=DUR/lines.length;
+  const tTimer=setInterval(()=>{
+    ovLine.classList.remove('on');
+    setTimeout(()=>{i++;if(i<lines.length){ovLine.textContent=lines[i];ovLine.classList.add('on');}},420);
+  },step);
+  // 流れ星＆きらめき
+  shootTimer=setInterval(()=>{spawnShoot();if(Math.random()<.7){spawnSpark();spawnSpark();}},650);
+  // フィナーレ
+  setTimeout(()=>{
+    clearInterval(tTimer);clearInterval(shootTimer);
+    flash.classList.add('fire');
+    setTimeout(()=>{overlay.classList.remove('show');showResult();},520);
+  },DUR);
+}
+
+/* ========== 結果 ========== */
+function showResult(){
+  const d=currentDayNum();
+  const s=SIGNS[moonSignIdx(d)];
+  const p=PHASES[selPhase];
+  resultEl.innerHTML=`
+    <div class="card">
+      <div class="res-moon"><i style="left:${p.shLeft}"></i></div>
+      <div class="sign-title">あなたの月星座は「${s.n}」</div>
+      <div class="sign-sub">Moon in ${s.e}　／　${s.el}のエレメント　×　${p.name}</div>
+      <div class="kws">${s.kw.map(k=>`<span class="keyword">#${k}</span>`).join('')}</div>
+      <div class="reading">
+        <h3>あなたの本当の心</h3><p>${s.body}</p>
+        <h3>生まれた夜の月が告げること（${p.name}）</h3><p>${PHASE_MSG[p.key]}</p>
+        <h3>月からのメッセージ</h3><p>${s.care}</p>
+      </div>
+      <div class="promo">
+        <div class="pt">もっと深く、あなただけの月を読み解きませんか?</div>
+        <div class="ps">${LINE_NAME}の公式LINEでは、月星座をいかした<br>メッセージや運勢をお届けしています🌙</div>
+        <a class="line-btn" href="${LINE_URL}" target="_blank" rel="noopener">
+          <span class="line-ico">L</span>${LINE_NAME}のLINEを追加する</a>
+      </div>
+      <button class="again" onclick="resetGame()">もう一度占う</button>
+    </div>`;
+  resultEl.classList.add('show');
+  resultEl.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function resetGame(){
+  resultEl.classList.remove('show');resultEl.innerHTML='';
+  $('inputCard').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 /* ========== 12星座（月星座）の読み ========== */
@@ -484,8 +565,6 @@ const SIGNS=[
   body:'境界のない海のように、あなたの心は人の気持ちと溶け合います。豊かな想像力と深い共感力で、傷ついた人をそっと包む癒しの人。夢やイメージの世界に心の故郷があり、芸術や祈りに触れると魂が満たされます。やさしさは、あなたの最大の才能です。',
   care:'人の感情を受け取りすぎたら、ひとりの時間で心をリセットして。NOと言っていいのです。'},
 ];
-
-/* ========== 月相 × 月星座 のメッセージ ========== */
 const PHASE_MSG={
   new:'生まれたとき、空に月はありませんでした。あなたは「ゼロから何かを生み出す」種を持つ人。直感を信じて踏み出すとき、運命が動きます。',
   waxc:'生まれたとき、空には細い三日月。芽生えたばかりの好奇心と、未来への淡い期待を抱く人。新しい出会いと学びがあなたを育てます。',
@@ -496,61 +575,6 @@ const PHASE_MSG={
   lastq:'生まれたとき、空には下弦の月。立ち止まり、内側を見つめる力を持つ人。手放すことで、本当に大切なものが見えてきます。',
   wanc:'生まれたとき、空には明け方の有明の月。古いものを浄化し、次の始まりへ橋を架ける人。静かな祈りのような優しさがあなたの魅力です。',
 };
-
-/* ========== 演出 → 結果表示 ========== */
-const overlay=document.getElementById('overlay');
-const ritualText=document.getElementById('ritualText');
-const resultEl=document.getElementById('result');
-
-castBtn.addEventListener('click',()=>{
-  const lines=['月の光を集めています…','あなたの生まれた夜へ…','心の奥をのぞきます…'];
-  overlay.classList.add('show');resultEl.classList.remove('show');
-  let i=0;ritualText.textContent=lines[0];
-  const t=setInterval(()=>{i++;if(i<lines.length){ritualText.textContent=lines[i];}},1100);
-  setTimeout(()=>{
-    clearInterval(t);overlay.classList.remove('show');
-    showResult();
-  },3600);
-});
-
-function showResult(){
-  const tz=PLACES[+bplace.value].tz;
-  const dayNum=dayNumFromInputs(bday.value,btime.value,tz);
-  const idx=moonSignFromDayNum(dayNum);
-  const s=SIGNS[idx];
-  const p=PHASES[selPhase];
-  const phaseMsg=PHASE_MSG[p.key];
-  resultEl.innerHTML=`
-    <div class="card">
-      <div class="sign-title">あなたの月星座は「${s.n}」</div>
-      <div class="sign-sub">Moon in ${s.e} ／ ${s.el}のエレメント × ${p.name}</div>
-      <div>${s.kw.map(k=>`<span class="keyword">#${k}</span>`).join('')}</div>
-      <div class="reading">
-        <h3>あなたの本当の心</h3>
-        <p>${s.body}</p>
-        <h3>生まれた月の形が告げること（${p.name}）</h3>
-        <p>${phaseMsg}</p>
-        <h3>月からのメッセージ</h3>
-        <p>${s.care}</p>
-      </div>
-
-      <div class="promo">
-        <div class="pt">もっと深く、あなただけの月を読み解きませんか?</div>
-        <div class="ps">${LINE_NAME}のLINEでは、月星座をいかしたメッセージや<br>運勢をお届けしています。ぜひ友だち追加してください🌙</div>
-        <a class="line-btn" href="${LINE_URL}" target="_blank" rel="noopener">
-          <span class="line-ico">L</span>${LINE_NAME}のLINEを追加する
-        </a>
-      </div>
-
-      <button class="again" onclick="reset()">もう一度占う</button>
-    </div>`;
-  resultEl.classList.add('show');
-  resultEl.scrollIntoView({behavior:'smooth',block:'start'});
-}
-function reset(){
-  resultEl.classList.remove('show');resultEl.innerHTML='';
-  document.getElementById('inputCard').scrollIntoView({behavior:'smooth'});
-}
 </script>
 </body>
 </html>
