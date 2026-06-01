@@ -2,7 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a1f">
 <title>月の占い 〜あなたの本当の心〜</title>
 <style>
   :root{
@@ -13,14 +15,17 @@
     --text:#eae6ff;
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
   html,body{height:100%}
   body{
     font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
     background:radial-gradient(ellipse at 50% -10%,#1c1c44 0%,var(--ink2) 45%,var(--ink) 100%);
+    background-attachment:fixed;
     color:var(--text);
     min-height:100vh;
     overflow-x:hidden;
     position:relative;
+    -webkit-tap-highlight-color:transparent;
   }
   /* 星空 */
   #stars,#stars2{
@@ -146,6 +151,34 @@
     padding:11px 26px;border-radius:999px;cursor:pointer;font-family:inherit;letter-spacing:.1em;font-size:13px}
   .again:hover{background:rgba(231,200,115,.12)}
   .note{font-size:11px;opacity:.5;margin-top:26px;letter-spacing:.05em;line-height:1.8}
+
+  /* ===== スマホ最適化 ===== */
+  @media (max-width:480px){
+    .wrap{padding:34px 14px 64px}
+    h1{letter-spacing:.12em}
+    .sub{letter-spacing:.12em;font-size:12px;margin-bottom:26px}
+    .card{padding:20px 15px;border-radius:15px}
+    .moon-stage{width:112px;height:112px;margin-bottom:22px}
+    .phase-grid{gap:7px}
+    .phase-btn{padding:9px 3px 7px;border-radius:10px}
+    .phase-ico{width:34px;height:34px;margin-bottom:5px}
+    .phase-name{font-size:10px;letter-spacing:0}
+    button.cast{font-size:16px;letter-spacing:.12em;padding:15px}
+    .reading{font-size:14.5px;line-height:1.95}
+    .sign-title{font-size:21px}
+    .ritual-text{font-size:15px;letter-spacing:.18em;padding:0 18px}
+    .ring{animation-name:expandSm}
+  }
+  @keyframes expandSm{from{width:100px;height:100px;opacity:.8}to{width:300px;height:300px;opacity:0}}
+  /* 小さめ端末で月相を2行に収める保険 */
+  @media (max-width:340px){
+    .phase-grid{grid-template-columns:repeat(4,1fr);gap:5px}
+    .phase-name{font-size:9px}
+  }
+  /* 動きを減らす設定の人への配慮 */
+  @media (prefers-reduced-motion:reduce){
+    .moon,.ritual-moon,.star{animation:none}
+  }
 </style>
 </head>
 <body>
