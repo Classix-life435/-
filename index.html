@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>月の占い 〜あなたの本当の心〜</title>
+<style>
+  :root{
+    --gold:#e7c873;
+    --gold-soft:#f3e2af;
+    --ink:#0a0a1f;
+    --ink2:#12122e;
+    --text:#eae6ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+    background:radial-gradient(ellipse at 50% -10%,#1c1c44 0%,var(--ink2) 45%,var(--ink) 100%);
+    color:var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+  /* 星空 */
+  #stars,#stars2{
+    position:fixed;inset:0;pointer-events:none;z-index:0;
+  }
+  .star{
+    position:absolute;border-radius:50%;background:#fff;
+    animation:twinkle var(--dur,4s) ease-in-out infinite;
+    opacity:.6;
+  }
+  @keyframes twinkle{0%,100%{opacity:.15;transform:scale(.8)}50%{opacity:.95;transform:scale(1.2)}}
+
+  .wrap{
+    position:relative;z-index:2;
+    max-width:680px;margin:0 auto;
+    padding:48px 22px 80px;
+    text-align:center;
+  }
+  h1{
+    font-size:clamp(26px,6vw,40px);
+    letter-spacing:.18em;
+    font-weight:400;
+    margin-bottom:6px;
+    text-shadow:0 0 18px rgba(231,200,115,.55);
+  }
+  .sub{
+    color:var(--gold-soft);font-size:13px;letter-spacing:.25em;
+    opacity:.85;margin-bottom:36px;
+  }
+
+  /* 月のビジュアル */
+  .moon-stage{
+    width:140px;height:140px;margin:8px auto 30px;
+    position:relative;
+  }
+  .moon{
+    width:100%;height:100%;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fffdf2,#e9e4cf 55%,#b9b29a 100%);
+    box-shadow:0 0 50px 8px rgba(243,226,175,.5),inset -14px -10px 30px rgba(0,0,0,.35);
+    position:relative;overflow:hidden;
+    animation:floaty 6s ease-in-out infinite;
+  }
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  /* 月相を作る影 */
+  .shadow{
+    position:absolute;top:-5%;height:110%;width:110%;border-radius:50%;
+    background:var(--ink2);
+    transition:transform .6s ease, left .6s ease;
+  }
+
+  .card{
+    background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+    border:1px solid rgba(231,200,115,.35);
+    border-radius:18px;
+    padding:26px 22px;
+    backdrop-filter:blur(4px);
+    box-shadow:0 10px 40px rgba(0,0,0,.4);
+  }
+  label{display:block;text-align:left;margin:18px 0 8px;font-size:14px;letter-spacing:.08em;color:var(--gold-soft)}
+  input[type=date]{
+    width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(231,200,115,.4);
+    background:rgba(10,10,31,.6);color:var(--text);font-size:16px;font-family:inherit;
+  }
+  .phase-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px;
+  }
+  .phase-btn{
+    cursor:pointer;border:1px solid rgba(231,200,115,.3);border-radius:12px;
+    background:rgba(255,255,255,.03);padding:12px 6px 9px;
+    transition:all .25s;color:var(--text);
+  }
+  .phase-btn:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .phase-btn.sel{border-color:var(--gold);background:rgba(231,200,115,.16);box-shadow:0 0 16px rgba(231,200,115,.4)}
+  .phase-ico{
+    width:42px;height:42px;border-radius:50%;margin:0 auto 7px;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 35% 30%,#fffdf2,#cfc8ad);
+  }
+  .phase-ico i{position:absolute;top:-10%;height:120%;width:120%;border-radius:50%;background:#0f0f28}
+  .phase-name{font-size:11px;letter-spacing:.05em;line-height:1.3}
+
+  button.cast{
+    margin-top:28px;width:100%;padding:16px;border:none;border-radius:999px;cursor:pointer;
+    font-family:inherit;font-size:17px;letter-spacing:.18em;color:#1a1405;
+    background:linear-gradient(90deg,#d9b65f,#f3e2af,#d9b65f);
+    box-shadow:0 6px 24px rgba(231,200,115,.5);transition:transform .2s, filter .2s;
+  }
+  button.cast:hover{transform:translateY(-2px);filter:brightness(1.08)}
+  button.cast:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.5)}
+
+  /* 演出オーバーレイ */
+  #overlay{
+    position:fixed;inset:0;z-index:50;display:none;
+    align-items:center;justify-content:center;flex-direction:column;
+    background:radial-gradient(ellipse at 50% 50%,rgba(28,28,68,.9),rgba(5,5,18,.98));
+    backdrop-filter:blur(2px);
+  }
+  #overlay.show{display:flex;animation:fadein .6s ease}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .ritual-moon{
+    width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fffdf2,#e9e4cf 55%,#b9b29a 100%);
+    box-shadow:0 0 80px 20px rgba(243,226,175,.7);
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 60px 12px rgba(243,226,175,.6)}50%{transform:scale(1.12);box-shadow:0 0 110px 30px rgba(243,226,175,.9)}}
+  .ritual-text{margin-top:34px;font-size:18px;letter-spacing:.3em;color:var(--gold-soft);min-height:26px}
+  .ring{
+    position:absolute;border:1px solid rgba(231,200,115,.4);border-radius:50%;
+    animation:expand 2.6s linear infinite;
+  }
+  @keyframes expand{from{width:120px;height:120px;opacity:.8}to{width:480px;height:480px;opacity:0}}
+
+  /* 結果 */
+  #result{margin-top:30px;display:none}
+  #result.show{display:block;animation:rise 1s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  .sign-title{font-size:24px;letter-spacing:.12em;color:var(--gold);text-shadow:0 0 14px rgba(231,200,115,.5);margin-bottom:4px}
+  .sign-sub{font-size:13px;color:var(--gold-soft);letter-spacing:.2em;margin-bottom:18px;opacity:.85}
+  .reading{text-align:left;line-height:2;font-size:15px}
+  .reading h3{color:var(--gold-soft);font-size:14px;letter-spacing:.1em;margin:18px 0 4px;border-left:3px solid var(--gold);padding-left:10px}
+  .keyword{display:inline-block;margin:4px 6px 0 0;padding:5px 12px;border:1px solid rgba(231,200,115,.4);border-radius:999px;font-size:12px;color:var(--gold-soft)}
+  .again{margin-top:26px;background:none;border:1px solid rgba(231,200,115,.5);color:var(--gold-soft);
+    padding:11px 26px;border-radius:999px;cursor:pointer;font-family:inherit;letter-spacing:.1em;font-size:13px}
+  .again:hover{background:rgba(231,200,115,.12)}
+  .note{font-size:11px;opacity:.5;margin-top:26px;letter-spacing:.05em;line-height:1.8}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div id="stars2"></div>
+
+<div class="wrap">
+  <h1>月 の 占 い</h1>
+  <div class="sub">― あなたの本当の心、月星座が語る ―</div>
+
+  <div class="moon-stage"><div class="moon"><div class="shadow" id="bigShadow"></div></div></div>
+
+  <div class="card" id="inputCard">
+    <label for="bday">生まれた日（生年月日）</label>
+    <input type="date" id="bday" min="1900-01-01" max="2099-12-31" value="2000-01-01">
+
+    <label>生まれたときの月の形</label>
+    <div class="phase-grid" id="phaseGrid"></div>
+
+    <button class="cast" id="castBtn" disabled>月に問う</button>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="note">
+    マドモアゼル愛先生の「月星座」の考え方を参考にした、エンターテインメント占いです。<br>
+    月星座は生年月日から概算で算出しています（時刻により境界はずれることがあります）。
+  </div>
+</div>
+
+<div id="overlay">
+  <div class="ring"></div><div class="ring" style="animation-delay:.8s"></div><div class="ring" style="animation-delay:1.6s"></div>
+  <div class="ritual-moon"></div>
+  <div class="ritual-text" id="ritualText"></div>
+</div>
+
+<script>
+/* ========== 星空生成 ========== */
+function makeStars(id,count){
+  const c=document.getElementById(id);
+  for(let i=0;i<count;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2+1;
+    s.style.width=s.style.height=sz+'px';
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.setProperty('--dur',(Math.random()*4+2)+'s');
+    s.style.animationDelay=(Math.random()*4)+'s';
+    c.appendChild(s);
+  }
+}
+makeStars('stars',90);makeStars('stars2',50);
+
+/* ========== 月相データ（生まれたときの月の形） ========== */
+/* offset:影の位置(0=満月 / ±で欠ける), 影の幅イメージ */
+const PHASES=[
+  {key:'new',     name:'新月',   shadow:0,   light:'はじまりと種まきの月'},
+  {key:'waxc',    name:'三日月', shadow:62,  light:'芽生え・好奇心の月'},
+  {key:'firstq',  name:'上弦の月', shadow:50, light:'決断と行動の月'},
+  {key:'waxg',    name:'満ちゆく月', shadow:30, light:'成長と挑戦の月'},
+  {key:'full',    name:'満月',   shadow:-200,light:'完成と感情があふれる月'},
+  {key:'wang',    name:'欠けゆく月', shadow:-30,light:'成熟と共有の月'},
+  {key:'lastq',   name:'下弦の月', shadow:-50,light:'手放しと内省の月'},
+  {key:'wanc',    name:'有明の月', shadow:-62,light:'浄化と次への準備の月'},
+];
+
+const phaseGrid=document.getElementById('phaseGrid');
+let selPhase=null;
+PHASES.forEach((p,idx)=>{
+  const b=document.createElement('div');b.className='phase-btn';b.dataset.idx=idx;
+  // アイコンの影位置
+  let shLeft;
+  if(p.shadow<=-100) shLeft='150%';            // 満月：影を外へ
+  else if(p.shadow===0) shLeft='-10%';         // 新月：影で覆う … 後で調整
+  else shLeft=null;
+  b.innerHTML=`<div class="phase-ico"><i style="left:${iconShadowLeft(p)}"></i></div><div class="phase-name">${p.name}</div>`;
+  b.onclick=()=>selectPhase(idx,b);
+  phaseGrid.appendChild(b);
+});
+
+function iconShadowLeft(p){
+  // 新月=ほぼ全部影 / 満月=影なし / その間
+  if(p.key==='new') return '8%';
+  if(p.key==='full') return '160%';
+  if(p.shadow>0) return (p.shadow-10)+'%';   // 満ちる側：右に影
+  return (-110-p.shadow)+'%';                 // 欠ける側：左に影
+}
+
+function selectPhase(idx,el){
+  selPhase=idx;
+  document.querySelectorAll('.phase-btn').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel');
+  // 大きな月にも反映
+  const p=PHASES[idx];
+  document.getElementById('bigShadow').style.left=iconShadowLeft(p);
+  checkReady();
+}
+
+const bday=document.getElementById('bday');
+const castBtn=document.getElementById('castBtn');
+bday.addEventListener('change',checkReady);
+function checkReady(){castBtn.disabled=!(bday.value && selPhase!==null);}
+
+/* ========== 月星座の概算計算 ========== */
+/* Paul Schlyter の簡易式 + 主要摂動項。月の黄経からサインを判定 */
+function moonSign(dateStr){
+  const d=new Date(dateStr+'T12:00:00Z'); // 正午UTで概算
+  // 2000 Jan 0.0 TU からの日数
+  const dayNum=(d.getTime()/86400000) - 10956.0; // 元期 2000 Jan 0.0(UT)
+  const rad=Math.PI/180, rev=x=>((x%360)+360)%360;
+  // 月の軌道要素
+  let N=125.1228-0.0529538083*dayNum;
+  let i=5.1454;
+  let w=318.0634+0.1643573223*dayNum;
+  let M=115.3654+13.0649929509*dayNum;
+  const e=0.054900,a=60.2666;
+  // 太陽の要素（摂動用）
+  let Ms=356.0470+0.9856002585*dayNum;
+  let ws=282.9404+4.70935e-5*dayNum;
+  M=rev(M);Ms=rev(Ms);N=rev(N);
+  // 離心近点角
+  let E=M+ (180/Math.PI)*e*Math.sin(M*rad)*(1+e*Math.cos(M*rad));
+  for(let k=0;k<6;k++){
+    E=E-(E-(180/Math.PI)*e*Math.sin(E*rad)-M)/(1-e*Math.cos(E*rad));
+  }
+  // 直交座標→距離・真近点角
+  const xv=a*(Math.cos(E*rad)-e);
+  const yv=a*Math.sqrt(1-e*e)*Math.sin(E*rad);
+  const v=rev((180/Math.PI)*Math.atan2(yv,xv));
+  const r=Math.sqrt(xv*xv+yv*yv);
+  // 黄道座標
+  const xh=r*(Math.cos(N*rad)*Math.cos((v+w)*rad)-Math.sin(N*rad)*Math.sin((v+w)*rad)*Math.cos(i*rad));
+  const yh=r*(Math.sin(N*rad)*Math.cos((v+w)*rad)+Math.cos(N*rad)*Math.sin((v+w)*rad)*Math.cos(i*rad));
+  let lon=rev((180/Math.PI)*Math.atan2(yh,xh));
+  // 主要摂動項
+  const Lm=rev(N+w+M);            // 月の平均黄経
+  const Ls=rev(Ms+ws);            // 太陽の平均黄経
+  const Dm=rev(Lm-Ls);            // 平均離角
+  const F=rev(Lm-N);              // 緯度引数
+  lon+= -1.274*Math.sin((M-2*Dm)*rad)
+        +0.658*Math.sin(2*Dm*rad)
+        -0.186*Math.sin(Ms*rad)
+        -0.059*Math.sin((2*M-2*Dm)*rad)
+        -0.057*Math.sin((M-2*Dm+Ms)*rad)
+        +0.053*Math.sin((M+2*Dm)*rad)
+        +0.046*Math.sin((2*Dm-Ms)*rad)
+        +0.041*Math.sin((M-Ms)*rad)
+        -0.035*Math.sin(Dm*rad)
+        -0.031*Math.sin((M+Ms)*rad)
+        -0.015*Math.sin((2*F-2*Dm)*rad)
+        +0.011*Math.sin((M-4*Dm)*rad);
+  lon=rev(lon);
+  return Math.floor(lon/30); // 0..11
+}
+
+/* ========== 12星座（月星座）の読み ========== */
+const SIGNS=[
+ {n:'牡羊座',e:'Aries',el:'火',kw:['情熱','直感','スタート'],
+  body:'あなたの心の奥には、いつも「今すぐ動きたい」という純粋な衝動があります。感情が湧いた瞬間に体が先に動く人。理屈より先に「好き・嫌い」がはっきりするのは、月が牡羊座にあるあなたの素直さ。傷ついてもすぐ立ち直る回復力が、本当の強さです。',
+  care:'勝ち負けで心を測らないこと。焦りを感じたら、ひと呼吸おくと世界が優しくなります。'},
+ {n:'牡牛座',e:'Taurus',el:'地',kw:['安心','五感','マイペース'],
+  body:'心が満たされるのは、美味しいもの・心地よい肌触り・安心できる場所。あなたの感情は急がず、ゆっくり育ちます。一度心を許した人やものを大切に守り続ける、その一途さが月牡牛座のやさしさ。あわてず、自分のペースでいるときが一番あなたらしい。',
+  care:'変化を怖がりすぎないで。手放すことで、新しい心地よさが入ってきます。'},
+ {n:'双子座',e:'Gemini',el:'風',kw:['好奇心','言葉','軽やか'],
+  body:'あなたの心は、いつも何かを知りたがっています。気持ちを言葉にすることで安心し、おしゃべりや情報のやりとりが心の栄養に。感情がくるくる変わるのは飽きっぽさではなく、世界を多面的に感じられる才能。退屈が一番の苦手です。',
+  care:'頭で考えすぎて心がついていけない時は、深呼吸を。「感じる」時間も大切に。'},
+ {n:'蟹座',e:'Cancer',el:'水',kw:['共感','家族','守る'],
+  body:'月が最も力を発揮する蟹座。あなたは人の気持ちを肌で感じ取り、誰かを守り、育てることに深い喜びを感じます。安心できる居場所と、心を許せる人がいてこそ輝く人。涙もろさは弱さではなく、豊かな感受性の証です。',
+  care:'人を思いやる前に、まず自分の心を満たしてあげて。境界線を引く勇気も愛です。'},
+ {n:'獅子座',e:'Leo',el:'火',kw:['表現','誇り','あたたかさ'],
+  body:'あなたの心は、太陽のように人を照らしたい人。認められ、喜ばれることで心が満ちていきます。素直に「うれしい」「楽しい」を表現できる華やかさは、まわりを元気にする贈り物。本当は誰よりも純粋で、まっすぐな愛情の持ち主です。',
+  care:'評価されない時こそ、自分で自分を誇って。あなたの価値は他人が決めるものではありません。'},
+ {n:'乙女座',e:'Virgo',el:'地',kw:['丁寧','気配り','整える'],
+  body:'細やかなことに気づき、人知れず誰かを支える――それがあなたの心のよろこび。きちんと整っていると安心し、役に立てたときに深く満たされます。心配性に見えて、その裏には「ちゃんと大切にしたい」という真面目な愛情があります。',
+  care:'完璧でなくて大丈夫。自分にも「よくやってるね」と声をかけてあげて。'},
+ {n:'天秤座',e:'Libra',el:'風',kw:['調和','美','公平'],
+  body:'あなたの心は、いつも心地よいバランスを探しています。争いや不調和が苦手で、人と人の間をなめらかにつなぐ名人。美しいもの、品のあるものに触れると心が整います。誰かと心を分かち合えてこそ、本当の安心を感じる人です。',
+  care:'みんなに合わせすぎて、自分の本音を見失わないで。「私はどうしたい?」を大切に。'},
+ {n:'蠍座',e:'Scorpio',el:'水',kw:['深さ','一途','再生'],
+  body:'あなたの感情は、海の底のように深く静か。一度心を決めたら、とことん深くつながりたい一途な人。表面ではクールに見えても、内側には誰よりも熱い情熱を秘めています。痛みを越えて生まれ変わる力――それが月蠍座の本当の強さです。',
+  care:'すべてを抱え込まないで。信頼できる人に心を開くことが、あなたを軽くします。'},
+ {n:'射手座',e:'Sagittarius',el:'火',kw:['自由','希望','冒険'],
+  body:'心が求めるのは、広い世界と、まだ見ぬ可能性。束縛されると息苦しくなり、自由に動けるときに心が輝きます。落ち込んでも「なんとかなる」と前を向ける天性の楽天家。その明るさと向上心が、まわりに希望を運びます。',
+  care:'遠くばかり見て、足元の小さな幸せを見逃さないで。今ここにも宝物があります。'},
+ {n:'山羊座',e:'Capricorn',el:'地',kw:['誠実','責任','努力'],
+  body:'あなたの心は、コツコツと積み上げることで安心します。感情をむやみに表に出さず、責任を引き受ける大人な人。一見クールでも、内側には大切な人を守り抜く深い情があります。時間をかけて築いた信頼こそ、あなたの誇りです。',
+  care:'頑張りすぎる自分を、もっと甘やかして。弱音を吐ける場所があっていいのです。'},
+ {n:'水瓶座',e:'Aquarius',el:'風',kw:['個性','自由','友愛'],
+  body:'あなたの心は、人と同じであることに縛られません。独自の感性で物事をとらえ、「みんなが幸せであってほしい」という広い愛を持つ人。感情にのまれず一歩引いて見られる客観性は、新しい時代を生きる才能。自由でいるとき、一番あなたらしい。',
+  care:'距離を取りすぎて孤独にならないで。心を開いて頼ることも、優しさのひとつです。'},
+ {n:'魚座',e:'Pisces',el:'水',kw:['やさしさ','想像力','癒し'],
+  body:'境界のない海のように、あなたの心は人の気持ちと溶け合います。豊かな想像力と深い共感力で、傷ついた人をそっと包む癒しの人。夢やイメージの世界に心の故郷があり、芸術や祈りに触れると魂が満たされます。やさしさは、あなたの最大の才能です。',
+  care:'人の感情を受け取りすぎたら、ひとりの時間で心をリセットして。NOと言っていいのです。'},
+];
+
+/* ========== 月相 × 月星座 のメッセージ ========== */
+const PHASE_MSG={
+  new:'生まれたとき、空に月はありませんでした。あなたは「ゼロから何かを生み出す」種を持つ人。直感を信じて踏み出すとき、運命が動きます。',
+  waxc:'生まれたとき、空には細い三日月。芽生えたばかりの好奇心と、未来への淡い期待を抱く人。新しい出会いと学びがあなたを育てます。',
+  firstq:'生まれたとき、空には上弦の月。心に決めたら行動する力を持つ人。壁にぶつかってこそ燃えるあなたは、挑戦のなかで輝きます。',
+  waxg:'生まれたとき、月は満ちてゆく途中。成長と拡大のエネルギーをまとう人。今より大きくなりたいという健やかな欲が、あなたを前へ進めます。',
+  full:'生まれたとき、空には満月。感情ゆたかで、人を惹きつける明るさを持つ人。心に湧くものを素直に表現するほど、人生が満ちていきます。',
+  wang:'生まれたとき、月は欠けはじめた満月。経験を人に分け与える成熟の人。学んだことを誰かのために使うとき、深い充実を感じます。',
+  lastq:'生まれたとき、空には下弦の月。立ち止まり、内側を見つめる力を持つ人。手放すことで、本当に大切なものが見えてきます。',
+  wanc:'生まれたとき、空には明け方の有明の月。古いものを浄化し、次の始まりへ橋を架ける人。静かな祈りのような優しさがあなたの魅力です。',
+};
+
+/* ========== 演出 → 結果表示 ========== */
+const overlay=document.getElementById('overlay');
+const ritualText=document.getElementById('ritualText');
+const resultEl=document.getElementById('result');
+
+castBtn.addEventListener('click',()=>{
+  const lines=['月の光を集めています…','あなたの生まれた夜へ…','心の奥をのぞきます…'];
+  overlay.classList.add('show');resultEl.classList.remove('show');
+  let i=0;ritualText.textContent=lines[0];
+  const t=setInterval(()=>{i++;if(i<lines.length){ritualText.textContent=lines[i];}},1100);
+  setTimeout(()=>{
+    clearInterval(t);overlay.classList.remove('show');
+    showResult();
+  },3600);
+});
+
+function showResult(){
+  const idx=moonSign(bday.value);
+  const s=SIGNS[idx];
+  const p=PHASES[selPhase];
+  const phaseMsg=PHASE_MSG[p.key];
+  resultEl.innerHTML=`
+    <div class="card">
+      <div class="sign-title">あなたの月星座は「${s.n}」</div>
+      <div class="sign-sub">Moon in ${s.e} ／ ${s.el}のエレメント × ${p.name}</div>
+      <div>${s.kw.map(k=>`<span class="keyword">#${k}</span>`).join('')}</div>
+      <div class="reading">
+        <h3>あなたの本当の心</h3>
+        <p>${s.body}</p>
+        <h3>生まれた月の形が告げること（${p.name}）</h3>
+        <p>${phaseMsg}</p>
+        <h3>月からのメッセージ</h3>
+        <p>${s.care}</p>
+      </div>
+      <button class="again" onclick="reset()">もう一度占う</button>
+    </div>`;
+  resultEl.classList.add('show');
+  resultEl.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function reset(){
+  resultEl.classList.remove('show');resultEl.innerHTML='';
+  document.getElementById('inputCard').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>
