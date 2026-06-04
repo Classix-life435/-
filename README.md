@@ -13,12 +13,23 @@
 - データは `src/lib/mock-data.ts` のモックデータ。
   型定義（`src/lib/types.ts`）はそのままAPIレスポンス型として再利用でき、API接続しやすい構造。
 
-## セットアップ
+## 公開URL（GitHub Pages）
+
+`claude/vigilant-edison-8UFgS` または `main` にプッシュすると、GitHub Actions が
+自動でビルドし GitHub Pages に公開します。公開先URL:
+
+**https://classix-life435.github.io/-/**
+
+> 初回はリポジトリの **Settings → Pages → Source** が「GitHub Actions」に
+> なっている必要があります（ワークフローが自動で有効化を試みます）。
+> Actions タブの「Deploy to GitHub Pages」完了後にURLが有効になります。
+
+## セットアップ（ローカル）
 
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # 本番ビルド
+npm run build    # 静的書き出し（out/ に生成）
 ```
 
 ## 画面構成
