@@ -4,9 +4,9 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 
 export const metadata: Metadata = {
-  title: "Hotel Voice Concierge｜ホテルフロントAI管理システム",
+  title: "VoxaLink Workforce｜人財DXプラットフォーム",
   description:
-    "予約・問い合わせ・音声案内をひとつにまとめるホテルフロントAI管理システム",
+    "採用・入社・教育・労務・定着までをひとつに束ねる、人事部のためのAI人財DX管理プラットフォーム",
 };
 
 export default function RootLayout({

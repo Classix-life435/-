@@ -1,60 +1,54 @@
 import { Badge } from "./badge";
 import {
-  reservationStatusMeta,
-  channelMeta,
-  paymentMeta,
-  inquiryStatusMeta,
-  priorityMeta,
-  categoryMeta,
-  roomStatusMeta,
-  staffRoleMeta,
-  workStatusMeta,
+  applicantStatusMeta,
+  contractStatusMeta,
+  contractTypeMeta,
+  courseStatusMeta,
+  taskStatusMeta,
+  hrCategoryMeta,
+  consultTypeMeta,
+  moodMeta,
 } from "@/lib/status";
 import type {
-  ReservationStatus,
-  ReservationChannel,
-  PaymentMethod,
-  InquiryStatus,
-  Priority,
-  InquiryCategory,
-  RoomStatus,
-  StaffRole,
-  WorkStatus,
+  ApplicantStatus,
+  ContractStatus,
+  ContractType,
+  CourseStatus,
+  TaskStatus,
+  HrCategory,
+  ConsultType,
+  Mood,
 } from "@/lib/types";
 
-export function ReservationStatusBadge({ value }: { value: ReservationStatus }) {
-  const m = reservationStatusMeta[value];
+export function ApplicantStatusBadge({ value }: { value: ApplicantStatus }) {
+  const m = applicantStatusMeta[value];
   return <Badge tone={m.tone} dot>{m.label}</Badge>;
 }
-export function ChannelBadge({ value }: { value: ReservationChannel }) {
-  const m = channelMeta[value];
-  return <Badge tone={m.tone}>{m.label}</Badge>;
-}
-export function PaymentBadge({ value }: { value: PaymentMethod }) {
-  const m = paymentMeta[value];
-  return <Badge tone={m.tone}>{m.label}</Badge>;
-}
-export function InquiryStatusBadge({ value }: { value: InquiryStatus }) {
-  const m = inquiryStatusMeta[value];
+export function ContractStatusBadge({ value }: { value: ContractStatus }) {
+  const m = contractStatusMeta[value];
   return <Badge tone={m.tone} dot>{m.label}</Badge>;
 }
-export function PriorityBadge({ value }: { value: Priority }) {
-  const m = priorityMeta[value];
-  return <Badge tone={m.tone}>優先度: {m.label}</Badge>;
-}
-export function CategoryBadge({ value }: { value: InquiryCategory }) {
-  const m = categoryMeta[value];
+export function ContractTypeBadge({ value }: { value: ContractType }) {
+  const m = contractTypeMeta[value];
   return <Badge tone={m.tone}>{m.label}</Badge>;
 }
-export function RoomStatusBadge({ value }: { value: RoomStatus }) {
-  const m = roomStatusMeta[value];
+export function CourseStatusBadge({ value }: { value: CourseStatus }) {
+  const m = courseStatusMeta[value];
   return <Badge tone={m.tone} dot>{m.label}</Badge>;
 }
-export function StaffRoleBadge({ value }: { value: StaffRole }) {
-  const m = staffRoleMeta[value];
+export function TaskStatusBadge({ value }: { value: TaskStatus }) {
+  const m = taskStatusMeta[value];
+  return <Badge tone={m.tone} dot>{m.label}</Badge>;
+}
+export function HrCategoryBadge({ value }: { value: HrCategory }) {
+  const m = hrCategoryMeta[value];
   return <Badge tone={m.tone}>{m.label}</Badge>;
 }
-export function WorkStatusBadge({ value }: { value: WorkStatus }) {
-  const m = workStatusMeta[value];
+export function ConsultTypeBadge({ value }: { value: ConsultType }) {
+  const m = consultTypeMeta[value];
+  return <Badge tone={m.tone}>{m.label}</Badge>;
+}
+export function MoodBadge({ value }: { value: Mood }) {
+  const m = moodMeta[value];
   return <Badge tone={m.tone} dot>{m.label}</Badge>;
 }

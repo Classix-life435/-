@@ -1,153 +1,120 @@
 // ============================================================
-// Hotel Voice Concierge - ドメイン型定義
+// VoxaLink Workforce - ドメイン型定義
+// 採用・入社・教育・労務・定着 を1つに束ねる人財DXプラットフォーム。
 // API 連携時はこの型をそのままレスポンス型として再利用できる。
 // ============================================================
 
-// ---- 予約 ----
-export type ReservationStatus =
-  | "tentative" // 仮予約
-  | "confirmed" // 確定
-  | "checkedIn" // チェックイン済み
-  | "checkedOut" // チェックアウト済み
-  | "cancelled"; // キャンセル
+/** 従業員ライフサイクルの5ステージ（PDFの 01〜05 に対応） */
+export type StageId =
+  | "recruit" // 01 採用
+  | "onboarding" // 02 入社
+  | "learning" // 03 教育
+  | "hr" // 04 労務
+  | "retention"; // 05 定着
 
-export type ReservationChannel =
-  | "phone" // 電話
-  | "web" // Web
-  | "agency" // 旅行代理店
-  | "walkIn" // 直接来館
-  | "other"; // その他
+// ---- 01 採用（VoxaLink Entrance） ----
+export type ApplicantStatus =
+  | "applied" // 応募受付
+  | "screening" // 書類選考
+  | "interview" // 面接
+  | "offer" // 内定
+  | "rejected"; // 見送り
 
-export type PaymentMethod = "cash" | "credit" | "onsite" | "prepaid" | "invoice";
-
-export interface Reservation {
-  id: string;
-  guestName: string;
-  guestNameKana?: string;
-  phone: string;
-  email: string;
-  checkIn: string; // ISO
-  checkOut: string; // ISO
-  roomType: string;
-  roomNumber: string;
-  guests: number;
-  adults: number;
-  children: number;
-  price: number;
-  payment: PaymentMethod;
-  status: ReservationStatus;
-  channel: ReservationChannel;
-  staff: string; // 受付担当者
-  note?: string;
-  createdAt: string;
-}
-
-// ---- 問い合わせ ----
-export type InquiryStatus =
-  | "open" // 未対応
-  | "inProgress" // 対応中
-  | "needsStaff" // スタッフ確認必要
-  | "resolved"; // 対応済み
-
-export type Priority = "low" | "medium" | "high" | "urgent";
-
-export type InquiryCategory =
-  | "facility" // 客室設備
-  | "amenity" // アメニティ
-  | "cleaning" // 清掃
-  | "wifi" // Wi-Fi
-  | "breakfast" // 朝食
-  | "parking" // 駐車場
-  | "checkInOut" // チェックイン/アウト
-  | "nearby" // 周辺施設
-  | "trouble" // トラブル対応
-  | "emergency" // 緊急対応
-  | "roomService"; // ルームサービス
-
-export interface Inquiry {
-  id: string;
-  guestName: string;
-  roomNumber: string;
-  content: string;
-  category: InquiryCategory;
-  status: InquiryStatus;
-  priority: Priority;
-  createdAt: string;
-  assignee?: string;
-  aiHandled: boolean; // AI が一次対応済みか
-  needsHuman: boolean; // 人間対応が必要か
-  aiAnswer?: string;
-  memo?: string;
-}
-
-// ---- 音声 AI ログ ----
-export type VoiceStatus = "completed" | "playing" | "escalated" | "transcribing";
-
-export interface VoiceLog {
-  id: string;
-  guestName: string;
-  roomNumber: string;
-  sttText: string; // STT 変換テキスト
-  category: InquiryCategory;
-  aiAnswer: string; // AI 回答文
-  ttsStatus: "played" | "pending" | "failed";
-  status: VoiceStatus;
-  needsStaff: boolean;
-  startedAt: string;
-  endedAt?: string;
-  escalationReason?: string;
-  durationSec: number;
-  transcript: { role: "guest" | "ai" | "staff"; text: string; at: string }[];
-}
-
-// ---- ナレッジ ----
-export interface Knowledge {
-  id: string;
-  title: string;
-  category: InquiryCategory;
-  phrases: string[]; // 想定される言い回し
-  answer: string; // 回答文
-  voiceAnswer: string; // 音声案内用の短い回答
-  handling: string; // 対応方法
-  needsStaff: boolean;
-  priority: Priority;
-  published: boolean;
-  useForAi: boolean;
-  updatedAt: string;
-  author: string;
-}
-
-// ---- 客室 ----
-export type RoomStatus =
-  | "vacant" // 空室
-  | "occupied" // 宿泊中
-  | "cleaning" // 清掃中
-  | "cleaned" // 清掃完了
-  | "maintenance" // メンテナンス中
-  | "outOfService"; // 利用停止
-
-export interface Room {
-  id: string;
-  number: string;
-  type: string;
-  capacity: number;
-  guestName?: string;
-  status: RoomStatus;
-  price: number;
-  amenitiesOk: boolean;
-  maintenanceNote?: string;
-}
-
-// ---- スタッフ ----
-export type StaffRole = "admin" | "front" | "cleaning" | "maintenance";
-export type WorkStatus = "working" | "break" | "off";
-
-export interface Staff {
+export interface Applicant {
   id: string;
   name: string;
-  role: StaffRole;
-  email: string;
-  phone: string;
-  openInquiries: number;
-  workStatus: WorkStatus;
+  position: string; // 応募職種
+  source: string; // 応募経路
+  status: ApplicantStatus;
+  aiScore: number; // AIマッチ度 0-100
+  appliedAt: string; // ISO
+  aiInterview: boolean; // AI面接実施済み
+}
+
+// ---- 02 入社（電子契約） ----
+export type ContractStatus =
+  | "draft" // 作成中
+  | "sent" // 送付済み（署名待ち）
+  | "signed" // 署名済み
+  | "completed"; // 完了
+
+export type ContractType = "employment" | "conditions"; // 雇用契約 / 労働条件通知
+
+export interface Contract {
+  id: string;
+  employeeName: string;
+  type: ContractType;
+  status: ContractStatus;
+  sentAt: string; // ISO
+  joinDate: string; // 入社予定日 ISO
+}
+
+// ---- 03 教育（Jobルール365 / LMS） ----
+export type CourseStatus = "notStarted" | "inProgress" | "completed";
+
+export interface Enrollment {
+  id: string;
+  employeeName: string;
+  courseName: string;
+  category: string; // 例: コンプライアンス研修 / 業務ルール
+  status: CourseStatus;
+  progress: number; // 0-100
+  dueDate: string; // ISO
+}
+
+// ---- 04 労務（就業規則AI / 総務AI / 人事AI） ----
+export type TaskStatus = "open" | "inProgress" | "done";
+export type HrCategory = "rule" | "general" | "personnel"; // 就業規則 / 総務 / 人事
+
+export interface HrTask {
+  id: string;
+  title: string;
+  category: HrCategory;
+  status: TaskStatus;
+  aiHandled: boolean; // AIが一次回答済み
+  requester: string; // 起票者
+  createdAt: string; // ISO
+}
+
+// ---- 05 定着（ナツメアイHR / 社員相談AI / ハラスメント相談AI） ----
+export type ConsultType = "engagement" | "consult" | "harassment";
+export type Mood = "good" | "normal" | "risk"; // 良好 / 普通 / 要フォロー
+
+export interface Consultation {
+  id: string;
+  employeeName: string;
+  type: ConsultType;
+  mood: Mood;
+  engagement: number; // エンゲージメントスコア 0-100
+  summary: string; // AI要約
+  createdAt: string; // ISO
+}
+
+// ---- 横断アクティビティ（統一フィード用） ----
+export interface Activity {
+  id: string;
+  stage: StageId;
+  employeeName: string;
+  message: string;
+  at: string; // ISO
+  aiHandled: boolean;
+}
+
+// ---- ダッシュボード集計 ----
+export interface DashboardStats {
+  applicants: number; // 選考中の応募者
+  offers: number; // 内定者
+  onboarding: number; // 入社手続き中
+  learningInProgress: number; // 受講中
+  openHrTasks: number; // 未対応の労務タスク
+  retentionRisk: number; // 要フォロー社員
+  employees: number; // 在籍者数
+  aiHandledToday: number; // 本日AIが対応した件数
+}
+
+// ---- ログインユーザー（人事担当者） ----
+export interface HrUser {
+  name: string;
+  role: string;
+  company: string;
 }

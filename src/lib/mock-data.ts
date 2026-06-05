@@ -1,564 +1,115 @@
 import type {
-  Reservation,
-  Inquiry,
-  VoiceLog,
-  Knowledge,
-  Room,
-  Staff,
+  Applicant,
+  Contract,
+  Enrollment,
+  HrTask,
+  Consultation,
+  Activity,
+  DashboardStats,
+  HrUser,
 } from "./types";
 
 // 「現在日時」を固定してデモの再現性を担保
-export const NOW = new Date("2026-06-04T14:30:00+09:00");
-export const HOTEL_NAME = "グランドベイ・ホテル横浜";
+export const NOW = new Date("2026-06-05T10:00:00+09:00");
+export const COMPANY_NAME = "株式会社RAGNIZE";
+export const PLATFORM_NAME = "VoxaLink Workforce";
 
-// ---- 予約 ----
-export const reservations: Reservation[] = [
-  {
-    id: "RSV-1042",
-    guestName: "山田 太郎",
-    guestNameKana: "ヤマダ タロウ",
-    phone: "090-1234-5678",
-    email: "yamada.taro@example.com",
-    checkIn: "2026-06-10",
-    checkOut: "2026-06-12",
-    roomType: "デラックスツイン",
-    roomNumber: "302",
-    guests: 2,
-    adults: 2,
-    children: 0,
-    price: 28000,
-    payment: "credit",
-    status: "confirmed",
-    channel: "phone",
-    staff: "鈴木 美咲",
-    note: "高層階希望。記念日のため夕食時にメッセージカード手配。",
-    createdAt: "2026-06-01T10:12:00+09:00",
-  },
-  {
-    id: "RSV-1043",
-    guestName: "佐藤 花子",
-    guestNameKana: "サトウ ハナコ",
-    phone: "080-2222-3333",
-    email: "hanako.sato@example.com",
-    checkIn: "2026-06-04",
-    checkOut: "2026-06-06",
-    roomType: "スタンダードダブル",
-    roomNumber: "501",
-    guests: 2,
-    adults: 2,
-    children: 0,
-    price: 19800,
-    payment: "onsite",
-    status: "checkedIn",
-    channel: "web",
-    staff: "田中 健",
-    createdAt: "2026-05-28T09:40:00+09:00",
-  },
-  {
-    id: "RSV-1044",
-    guestName: "高橋 一郎",
-    phone: "070-4444-5555",
-    email: "ichiro.t@example.com",
-    checkIn: "2026-06-04",
-    checkOut: "2026-06-05",
-    roomType: "シングル",
-    roomNumber: "210",
-    guests: 1,
-    adults: 1,
-    children: 0,
-    price: 9800,
-    payment: "prepaid",
-    status: "checkedIn",
-    channel: "agency",
-    staff: "鈴木 美咲",
-    note: "JTB経由。late check-in 22時予定。",
-    createdAt: "2026-05-30T15:05:00+09:00",
-  },
-  {
-    id: "RSV-1045",
-    guestName: "渡辺 由美",
-    phone: "090-6666-7777",
-    email: "yumi.w@example.com",
-    checkIn: "2026-06-05",
-    checkOut: "2026-06-08",
-    roomType: "ファミリースイート",
-    roomNumber: "705",
-    guests: 4,
-    adults: 2,
-    children: 2,
-    price: 62000,
-    payment: "credit",
-    status: "confirmed",
-    channel: "phone",
-    staff: "田中 健",
-    note: "ベビーベッド1台、子ども用アメニティ希望。",
-    createdAt: "2026-06-02T11:30:00+09:00",
-  },
-  {
-    id: "RSV-1046",
-    guestName: "中村 翔",
-    phone: "080-8888-9999",
-    email: "sho.n@example.com",
-    checkIn: "2026-06-04",
-    checkOut: "2026-06-04",
-    roomType: "デイユース",
-    roomNumber: "115",
-    guests: 1,
-    adults: 1,
-    children: 0,
-    price: 4500,
-    payment: "cash",
-    status: "tentative",
-    channel: "walkIn",
-    staff: "鈴木 美咲",
-    createdAt: "2026-06-04T08:55:00+09:00",
-  },
-  {
-    id: "RSV-1047",
-    guestName: "小林 さくら",
-    phone: "090-1010-2020",
-    email: "sakura.k@example.com",
-    checkIn: "2026-06-02",
-    checkOut: "2026-06-04",
-    roomType: "スタンダードツイン",
-    roomNumber: "408",
-    guests: 2,
-    adults: 2,
-    children: 0,
-    price: 22000,
-    payment: "credit",
-    status: "checkedOut",
-    channel: "web",
-    staff: "田中 健",
-    createdAt: "2026-05-25T19:20:00+09:00",
-  },
-  {
-    id: "RSV-1048",
-    guestName: "伊藤 大輔",
-    phone: "070-3030-4040",
-    email: "daisuke.i@example.com",
-    checkIn: "2026-06-11",
-    checkOut: "2026-06-13",
-    roomType: "デラックスキング",
-    roomNumber: "601",
-    guests: 2,
-    adults: 2,
-    children: 0,
-    price: 34000,
-    payment: "invoice",
-    status: "confirmed",
-    channel: "agency",
-    staff: "鈴木 美咲",
-    note: "法人契約（株式会社オーシャン）。請求書払い。",
-    createdAt: "2026-06-03T13:10:00+09:00",
-  },
-  {
-    id: "RSV-1049",
-    guestName: "松本 愛",
-    phone: "080-5050-6060",
-    email: "ai.m@example.com",
-    checkIn: "2026-06-04",
-    checkOut: "2026-06-07",
-    roomType: "スタンダードダブル",
-    roomNumber: "503",
-    guests: 2,
-    adults: 2,
-    children: 0,
-    price: 29700,
-    payment: "credit",
-    status: "confirmed",
-    channel: "phone",
-    staff: "田中 健",
-    createdAt: "2026-06-03T17:42:00+09:00",
-  },
-  {
-    id: "RSV-1050",
-    guestName: "木村 健太",
-    phone: "090-7070-8080",
-    email: "kenta.k@example.com",
-    checkIn: "2026-06-06",
-    checkOut: "2026-06-09",
-    roomType: "デラックスツイン",
-    roomNumber: "304",
-    guests: 3,
-    adults: 2,
-    children: 1,
-    price: 48000,
-    payment: "credit",
-    status: "tentative",
-    channel: "other",
-    staff: "鈴木 美咲",
-    note: "公式LINEから問い合わせ → 仮予約。支払い方法未確定。",
-    createdAt: "2026-06-04T12:01:00+09:00",
-  },
-];
-
-// ---- 問い合わせ ----
-export const inquiries: Inquiry[] = [
-  {
-    id: "INQ-2201",
-    guestName: "佐藤 花子",
-    roomNumber: "501",
-    content: "枕をもう一つ追加してほしいです。少し高めのものがあれば嬉しいです。",
-    category: "amenity",
-    status: "open",
-    priority: "medium",
-    createdAt: "2026-06-04T13:55:00+09:00",
-    aiHandled: true,
-    needsHuman: true,
-    aiAnswer:
-      "かしこまりました。追加の枕（高め）をお持ちいたします。ハウスキーピングへ手配いたしますので少々お待ちください。",
-    memo: "高め枕の在庫を清掃カートで確認のこと。",
-  },
-  {
-    id: "INQ-2202",
-    guestName: "高橋 一郎",
-    roomNumber: "210",
-    content: "Wi-Fiのパスワードを教えてください。",
-    category: "wifi",
-    status: "resolved",
-    priority: "low",
-    createdAt: "2026-06-04T12:20:00+09:00",
-    assignee: "AI コンシェルジュ",
-    aiHandled: true,
-    needsHuman: false,
-    aiAnswer:
-      "Wi-Fi名は Hotel-Free-WiFi、パスワードはお部屋の案内カードに記載しております。ご不明な場合はフロントまでご連絡ください。",
-  },
-  {
-    id: "INQ-2203",
-    guestName: "渡辺 由美",
-    roomNumber: "705",
-    content: "上の階から大きな物音がして眠れません。確認してもらえますか？",
-    category: "trouble",
-    status: "inProgress",
-    priority: "high",
-    createdAt: "2026-06-04T14:05:00+09:00",
-    assignee: "田中 健",
-    aiHandled: true,
-    needsHuman: true,
-    aiAnswer:
-      "ご不便をおかけし申し訳ございません。担当スタッフが状況を確認し、ご対応いたします。",
-    memo: "805号室へ状況確認に向かう。",
-  },
-  {
-    id: "INQ-2204",
-    guestName: "松本 愛",
-    roomNumber: "503",
-    content: "エアコンが効かず部屋が暑いです。至急見てほしいです。",
-    category: "trouble",
-    status: "needsStaff",
-    priority: "urgent",
-    createdAt: "2026-06-04T14:18:00+09:00",
-    assignee: "メンテナンス",
-    aiHandled: true,
-    needsHuman: true,
-    aiAnswer:
-      "大変申し訳ございません。設備担当がすぐにお部屋へ伺います。必要に応じてお部屋の移動もご案内いたします。",
-    memo: "メンテナンス佐々木へエスカレーション済み。代替室 505 を確保。",
-  },
-  {
-    id: "INQ-2205",
-    guestName: "高橋 一郎",
-    roomNumber: "210",
-    content: "チェックアウトの時間は何時までですか？",
-    category: "checkInOut",
-    status: "resolved",
-    priority: "low",
-    createdAt: "2026-06-04T11:02:00+09:00",
-    assignee: "AI コンシェルジュ",
-    aiHandled: true,
-    needsHuman: false,
-    aiAnswer: "チェックアウトは午前11時までとなっております。",
-  },
-  {
-    id: "INQ-2206",
-    guestName: "佐藤 花子",
-    roomNumber: "501",
-    content: "近くにコンビニはありますか？",
-    category: "nearby",
-    status: "resolved",
-    priority: "low",
-    createdAt: "2026-06-04T10:40:00+09:00",
-    assignee: "AI コンシェルジュ",
-    aiHandled: true,
-    needsHuman: false,
-    aiAnswer:
-      "ホテルを出て右手に徒歩2分のところにコンビニがございます。24時間営業です。",
-  },
-  {
-    id: "INQ-2207",
-    guestName: "中村 翔",
-    roomNumber: "115",
-    content: "ルームサービスで軽食を頼みたいのですが。",
-    category: "roomService",
-    status: "open",
-    priority: "medium",
-    createdAt: "2026-06-04T14:22:00+09:00",
-    aiHandled: false,
-    needsHuman: true,
-  },
-];
-
-// ---- 音声 AI ログ ----
-export const voiceLogs: VoiceLog[] = [
-  {
-    id: "VL-3301",
-    guestName: "山田 太郎",
-    roomNumber: "402",
-    sttText: "電気のスイッチはどこですか？",
-    category: "facility",
-    aiAnswer:
-      "電気のスイッチは、お部屋の入口横とベッドサイドにございます。ベッドサイドのパネルで室内照明をまとめて操作いただけます。",
-    ttsStatus: "played",
-    status: "completed",
-    needsStaff: false,
-    startedAt: "2026-06-04T13:40:00+09:00",
-    endedAt: "2026-06-04T13:40:38+09:00",
-    durationSec: 38,
-    transcript: [
-      { role: "guest", text: "電気のスイッチはどこですか？", at: "13:40:05" },
-      {
-        role: "ai",
-        text: "電気のスイッチは、お部屋の入口横とベッドサイドにございます。",
-        at: "13:40:12",
-      },
-    ],
-  },
-  {
-    id: "VL-3302",
-    guestName: "佐藤 花子",
-    roomNumber: "501",
-    sttText: "朝食は何時から何時までですか？会場はどこですか？",
-    category: "breakfast",
-    aiAnswer:
-      "朝食は午前6時30分から10時まで、2階のレストラン「マリーナ」でご提供しております。お部屋番号をお伝えください。",
-    ttsStatus: "played",
-    status: "completed",
-    needsStaff: false,
-    startedAt: "2026-06-04T07:10:00+09:00",
-    endedAt: "2026-06-04T07:10:45+09:00",
-    durationSec: 45,
-    transcript: [
-      { role: "guest", text: "朝食は何時からですか？", at: "07:10:03" },
-      {
-        role: "ai",
-        text: "朝食は午前6時30分から10時まで、2階のレストランでご提供しております。",
-        at: "07:10:10",
-      },
-    ],
-  },
-  {
-    id: "VL-3303",
-    guestName: "松本 愛",
-    roomNumber: "503",
-    sttText: "エアコンが全然効かないんですけど、すぐ来てもらえますか？",
-    category: "trouble",
-    aiAnswer:
-      "ご不便をおかけし申し訳ございません。設備担当へ連絡し、すぐにお部屋へ伺うよう手配いたします。",
-    ttsStatus: "played",
-    status: "escalated",
-    needsStaff: true,
-    startedAt: "2026-06-04T14:17:00+09:00",
-    endedAt: "2026-06-04T14:18:10+09:00",
-    durationSec: 70,
-    escalationReason: "設備トラブル（空調不良）のため人間対応が必要と判断。",
-    transcript: [
-      {
-        role: "guest",
-        text: "エアコンが全然効かないんですけど",
-        at: "14:17:05",
-      },
-      {
-        role: "ai",
-        text: "申し訳ございません。設備担当へ連絡いたします。",
-        at: "14:17:14",
-      },
-      {
-        role: "staff",
-        text: "（メンテナンス佐々木へ転送）",
-        at: "14:18:02",
-      },
-    ],
-  },
-  {
-    id: "VL-3304",
-    guestName: "中村 翔",
-    roomNumber: "115",
-    sttText: "駐車場はどこに停めればいいですか？",
-    category: "parking",
-    aiAnswer:
-      "駐車場は地下1階にございます。エレベーター横の入口からお入りください。1泊1,500円で承っております。",
-    ttsStatus: "pending",
-    status: "transcribing",
-    needsStaff: false,
-    startedAt: "2026-06-04T14:28:00+09:00",
-    durationSec: 12,
-    transcript: [
-      { role: "guest", text: "駐車場はどこに…", at: "14:28:04" },
-    ],
-  },
-];
-
-// ---- ナレッジ ----
-export const knowledgeBase: Knowledge[] = [
-  {
-    id: "KB-01",
-    title: "電気のスイッチはどこですか？",
-    category: "facility",
-    phrases: ["電気どこ", "照明のつけ方", "スイッチが見つからない", "ライトの操作"],
-    answer:
-      "お部屋の入口横、ベッドサイド、デスク横にスイッチがございます。ベッドサイドのパネルでは、室内照明をまとめて操作できます。",
-    voiceAnswer:
-      "電気のスイッチは、お部屋の入口横とベッドサイドにございます。",
-    handling: "AI 音声案内で完結。再質問が続く場合のみフロント対応。",
-    needsStaff: false,
-    priority: "low",
-    published: true,
-    useForAi: true,
-    updatedAt: "2026-05-20",
-    author: "鈴木 美咲",
-  },
-  {
-    id: "KB-02",
-    title: "Wi-Fiのパスワードを教えてください",
-    category: "wifi",
-    phrases: ["wifi", "ワイファイ", "ネット接続", "インターネット", "パスワード"],
-    answer:
-      "Wi-Fi名は Hotel-Free-WiFi、パスワードはフロントでお渡しした案内カードに記載されています。接続できない場合はフロントまでご連絡ください。",
-    voiceAnswer:
-      "Wi-Fi名はHotel-Free-WiFi、パスワードはお部屋の案内カードに記載しております。",
-    handling: "AI 音声案内で完結。",
-    needsStaff: false,
-    priority: "low",
-    published: true,
-    useForAi: true,
-    updatedAt: "2026-05-22",
-    author: "田中 健",
-  },
-  {
-    id: "KB-03",
-    title: "チェックアウトの時間は？",
-    category: "checkInOut",
-    phrases: ["チェックアウト", "何時まで", "退室時間", "延長できる"],
-    answer:
-      "チェックアウトは午前11時までです。レイトチェックアウトは1時間あたり1,000円で承ります（空室状況により最長14時まで）。",
-    voiceAnswer: "チェックアウトは午前11時までとなっております。",
-    handling: "延長希望の場合はフロントで空室確認のうえ対応。",
-    needsStaff: false,
-    priority: "low",
-    published: true,
-    useForAi: true,
-    updatedAt: "2026-05-18",
-    author: "鈴木 美咲",
-  },
-  {
-    id: "KB-04",
-    title: "朝食の時間と会場は？",
-    category: "breakfast",
-    phrases: ["朝食", "朝ごはん", "ブレックファスト", "レストラン場所"],
-    answer:
-      "朝食は午前6時30分から10時まで、2階レストラン「マリーナ」でビュッフェ形式にてご提供しております。お部屋番号をお伝えください。",
-    voiceAnswer:
-      "朝食は朝6時半から10時まで、2階のレストランでご利用いただけます。",
-    handling: "AI 音声案内で完結。",
-    needsStaff: false,
-    priority: "low",
-    published: true,
-    useForAi: true,
-    updatedAt: "2026-05-25",
-    author: "田中 健",
-  },
-  {
-    id: "KB-05",
-    title: "エアコン・空調の不調",
-    category: "trouble",
-    phrases: ["エアコン効かない", "暑い", "寒い", "空調", "冷房", "暖房"],
-    answer:
-      "ご不便をおかけし申し訳ございません。リモコンの設定をご確認のうえ、改善しない場合は設備担当が確認に伺います。状況により代替のお部屋をご案内します。",
-    voiceAnswer:
-      "申し訳ございません。設備担当がすぐにお部屋へ伺います。",
-    handling: "必ず人間（メンテナンス）へエスカレーション。",
-    needsStaff: true,
-    priority: "high",
-    published: true,
-    useForAi: true,
-    updatedAt: "2026-06-01",
-    author: "鈴木 美咲",
-  },
-  {
-    id: "KB-06",
-    title: "駐車場の場所と料金",
-    category: "parking",
-    phrases: ["駐車場", "車", "パーキング", "停める場所"],
-    answer:
-      "駐車場は地下1階です。エレベーター横の入口よりお入りください。料金は1泊1,500円（先着順）です。満車の場合は近隣提携駐車場をご案内します。",
-    voiceAnswer:
-      "駐車場は地下1階、1泊1,500円でご利用いただけます。",
-    handling: "AI 音声案内で完結。満車時はフロント対応。",
-    needsStaff: false,
-    priority: "medium",
-    published: true,
-    useForAi: true,
-    updatedAt: "2026-05-30",
-    author: "田中 健",
-  },
-  {
-    id: "KB-07",
-    title: "周辺のコンビニ・飲食店",
-    category: "nearby",
-    phrases: ["コンビニ", "近くのお店", "飲食店", "周辺"],
-    answer:
-      "ホテルを出て右手・徒歩2分にコンビニ（24時間）がございます。徒歩5分圏内に飲食店も多数ございますので、マップをお渡しします。",
-    voiceAnswer:
-      "コンビニはホテルを出て右手、徒歩2分のところにございます。",
-    handling: "AI 音声案内で完結。",
-    needsStaff: false,
-    priority: "low",
-    published: false,
-    useForAi: false,
-    updatedAt: "2026-05-15",
-    author: "鈴木 美咲",
-  },
-];
-
-// ---- 客室 ----
-export const rooms: Room[] = [
-  { id: "R-115", number: "115", type: "デイユース", capacity: 1, status: "vacant", price: 4500, amenitiesOk: true },
-  { id: "R-210", number: "210", type: "シングル", capacity: 1, guestName: "高橋 一郎", status: "occupied", price: 9800, amenitiesOk: true },
-  { id: "R-302", number: "302", type: "デラックスツイン", capacity: 2, status: "cleaned", price: 14000, amenitiesOk: true },
-  { id: "R-304", number: "304", type: "デラックスツイン", capacity: 3, status: "cleaning", price: 16000, amenitiesOk: false, maintenanceNote: "リネン補充待ち" },
-  { id: "R-408", number: "408", type: "スタンダードツイン", capacity: 2, status: "cleaning", price: 11000, amenitiesOk: false },
-  { id: "R-501", number: "501", type: "スタンダードダブル", capacity: 2, guestName: "佐藤 花子", status: "occupied", price: 9900, amenitiesOk: true },
-  { id: "R-503", number: "503", type: "スタンダードダブル", capacity: 2, guestName: "松本 愛", status: "maintenance", price: 9900, amenitiesOk: false, maintenanceNote: "空調不良。設備担当対応中。" },
-  { id: "R-601", number: "601", type: "デラックスキング", capacity: 2, status: "vacant", price: 17000, amenitiesOk: true },
-  { id: "R-705", number: "705", type: "ファミリースイート", capacity: 4, guestName: "渡辺 由美", status: "occupied", price: 20600, amenitiesOk: true },
-  { id: "R-808", number: "808", type: "コーナースイート", capacity: 3, status: "outOfService", price: 24000, amenitiesOk: false, maintenanceNote: "内装リニューアル工事中（〜6/20）" },
-];
-
-// ---- スタッフ ----
-export const staffList: Staff[] = [
-  { id: "S-01", name: "鈴木 美咲", role: "front", email: "suzuki@grandbay.example", phone: "045-111-0001", openInquiries: 2, workStatus: "working" },
-  { id: "S-02", name: "田中 健", role: "front", email: "tanaka@grandbay.example", phone: "045-111-0002", openInquiries: 1, workStatus: "working" },
-  { id: "S-03", name: "佐々木 修", role: "maintenance", email: "sasaki@grandbay.example", phone: "045-111-0003", openInquiries: 1, workStatus: "working" },
-  { id: "S-04", name: "山口 久美", role: "cleaning", email: "yamaguchi@grandbay.example", phone: "045-111-0004", openInquiries: 0, workStatus: "break" },
-  { id: "S-05", name: "井上 大地", role: "cleaning", email: "inoue@grandbay.example", phone: "045-111-0005", openInquiries: 0, workStatus: "working" },
-  { id: "S-06", name: "森 麻衣", role: "admin", email: "mori@grandbay.example", phone: "045-111-0000", openInquiries: 0, workStatus: "off" },
-];
-
-// 現在ログイン中スタッフ（ヘッダー表示用）
-export const currentStaff = staffList[0];
-
-// ---- ダッシュボード集計（モック） ----
-export const dashboardStats = {
-  checkInsToday: 4,
-  checkOutsToday: 3,
-  guestsStaying: 9,
-  vacantRooms: 8,
-  openInquiries: 3,
-  phoneReservationsToday: 5,
-  urgentInquiries: 1,
-  aiStatus: "online" as "online" | "offline",
-  aiHandledToday: 27,
-  aiResolutionRate: 0.82,
+export const currentUser: HrUser = {
+  name: "田中 美咲",
+  role: "人事部 マネージャー",
+  company: COMPANY_NAME,
 };
+
+// ============================================================
+// 01 採用（VoxaLink Entrance）
+// ============================================================
+export const applicants: Applicant[] = [
+  { id: "AP-2041", name: "佐藤 健一", position: "営業（中途）", source: "求人サイト", status: "interview", aiScore: 88, appliedAt: "2026-06-03T09:20:00+09:00", aiInterview: true },
+  { id: "AP-2040", name: "鈴木 彩花", position: "Webエンジニア", source: "リファラル", status: "offer", aiScore: 92, appliedAt: "2026-06-01T14:10:00+09:00", aiInterview: true },
+  { id: "AP-2039", name: "高橋 大輔", position: "カスタマーサポート", source: "自社サイト", status: "screening", aiScore: 74, appliedAt: "2026-06-04T11:05:00+09:00", aiInterview: false },
+  { id: "AP-2038", name: "伊藤 さくら", position: "経理（中途）", source: "求人サイト", status: "applied", aiScore: 81, appliedAt: "2026-06-05T08:40:00+09:00", aiInterview: false },
+  { id: "AP-2037", name: "渡辺 翔太", position: "営業（中途）", source: "エージェント", status: "interview", aiScore: 79, appliedAt: "2026-06-02T16:30:00+09:00", aiInterview: true },
+  { id: "AP-2036", name: "山本 真央", position: "Webエンジニア", source: "求人サイト", status: "rejected", aiScore: 58, appliedAt: "2026-05-30T10:00:00+09:00", aiInterview: true },
+];
+
+// ============================================================
+// 02 入社（電子契約）
+// ============================================================
+export const contracts: Contract[] = [
+  { id: "CT-388", employeeName: "鈴木 彩花", type: "employment", status: "sent", sentAt: "2026-06-04T13:00:00+09:00", joinDate: "2026-07-01T00:00:00+09:00" },
+  { id: "CT-387", employeeName: "鈴木 彩花", type: "conditions", status: "sent", sentAt: "2026-06-04T13:00:00+09:00", joinDate: "2026-07-01T00:00:00+09:00" },
+  { id: "CT-386", employeeName: "中村 拓也", type: "employment", status: "signed", sentAt: "2026-06-02T10:30:00+09:00", joinDate: "2026-06-16T00:00:00+09:00" },
+  { id: "CT-385", employeeName: "小林 ひかり", type: "employment", status: "completed", sentAt: "2026-05-28T09:00:00+09:00", joinDate: "2026-06-01T00:00:00+09:00" },
+  { id: "CT-384", employeeName: "加藤 蓮", type: "conditions", status: "draft", sentAt: "2026-06-05T09:30:00+09:00", joinDate: "2026-07-01T00:00:00+09:00" },
+];
+
+// ============================================================
+// 03 教育（Jobルール365 / LMS）
+// ============================================================
+export const enrollments: Enrollment[] = [
+  { id: "EN-510", employeeName: "小林 ひかり", courseName: "新入社員オンボーディング", category: "業務ルール", status: "inProgress", progress: 60, dueDate: "2026-06-15T00:00:00+09:00" },
+  { id: "EN-509", employeeName: "中村 拓也", courseName: "情報セキュリティ基礎", category: "コンプライアンス研修", status: "notStarted", progress: 0, dueDate: "2026-06-20T00:00:00+09:00" },
+  { id: "EN-508", employeeName: "松本 結衣", courseName: "ハラスメント防止研修", category: "コンプライアンス研修", status: "completed", progress: 100, dueDate: "2026-06-10T00:00:00+09:00" },
+  { id: "EN-507", employeeName: "井上 直樹", courseName: "Jobルール365：就業の基本", category: "業務ルール", status: "inProgress", progress: 35, dueDate: "2026-06-18T00:00:00+09:00" },
+  { id: "EN-506", employeeName: "木村 莉子", courseName: "個人情報保護法 基礎", category: "コンプライアンス研修", status: "inProgress", progress: 80, dueDate: "2026-06-12T00:00:00+09:00" },
+];
+
+// ============================================================
+// 04 労務（就業規則AI / 総務AI / 人事AI）
+// ============================================================
+export const hrTasks: HrTask[] = [
+  { id: "HR-922", title: "有給休暇の繰越上限について確認したい", category: "rule", status: "done", aiHandled: true, requester: "井上 直樹", createdAt: "2026-06-05T09:15:00+09:00" },
+  { id: "HR-921", title: "通勤手当の申請方法を教えてほしい", category: "general", status: "inProgress", aiHandled: true, requester: "松本 結衣", createdAt: "2026-06-05T08:50:00+09:00" },
+  { id: "HR-920", title: "育児休業の取得条件と手続き", category: "personnel", status: "open", aiHandled: false, requester: "木村 莉子", createdAt: "2026-06-04T17:20:00+09:00" },
+  { id: "HR-919", title: "リモートワーク規程の最新版を確認", category: "rule", status: "done", aiHandled: true, requester: "中村 拓也", createdAt: "2026-06-04T15:00:00+09:00" },
+  { id: "HR-918", title: "備品（モニター）の購入申請", category: "general", status: "open", aiHandled: false, requester: "小林 ひかり", createdAt: "2026-06-04T11:40:00+09:00" },
+];
+
+// ============================================================
+// 05 定着（ナツメアイHR / 社員相談AI / ハラスメント相談AI）
+// ============================================================
+export const consultations: Consultation[] = [
+  { id: "RT-140", employeeName: "井上 直樹", type: "engagement", mood: "good", engagement: 82, summary: "業務にやりがいを感じている。新しい挑戦を希望。", createdAt: "2026-06-05T09:00:00+09:00" },
+  { id: "RT-139", employeeName: "木村 莉子", type: "consult", mood: "risk", engagement: 48, summary: "業務量の偏りに不安。1on1でのフォローを推奨。", createdAt: "2026-06-04T18:10:00+09:00" },
+  { id: "RT-138", employeeName: "（匿名）", type: "harassment", mood: "risk", engagement: 0, summary: "チーム内のコミュニケーションに関する相談。要面談。", createdAt: "2026-06-04T16:45:00+09:00" },
+  { id: "RT-137", employeeName: "松本 結衣", type: "engagement", mood: "normal", engagement: 65, summary: "概ね良好。キャリアパスの相談あり。", createdAt: "2026-06-03T13:30:00+09:00" },
+  { id: "RT-136", employeeName: "中村 拓也", type: "consult", mood: "good", engagement: 78, summary: "入社後の立ち上がりは順調。特段の懸念なし。", createdAt: "2026-06-02T10:15:00+09:00" },
+];
+
+// ============================================================
+// 横断アクティビティ（統一フィード）
+// ============================================================
+export const activities: Activity[] = [
+  { id: "AC-09", stage: "recruit", employeeName: "伊藤 さくら", message: "AI応募受付が新規応募を自動登録しました", at: "2026-06-05T08:40:00+09:00", aiHandled: true },
+  { id: "AC-08", stage: "hr", employeeName: "井上 直樹", message: "就業規則AIが有給休暇の質問に回答しました", at: "2026-06-05T09:15:00+09:00", aiHandled: true },
+  { id: "AC-07", stage: "retention", employeeName: "井上 直樹", message: "ナツメアイHRがエンゲージメント良好を検知", at: "2026-06-05T09:00:00+09:00", aiHandled: true },
+  { id: "AC-06", stage: "onboarding", employeeName: "鈴木 彩花", message: "雇用契約・労働条件通知を電子送付しました", at: "2026-06-04T13:00:00+09:00", aiHandled: false },
+  { id: "AC-05", stage: "retention", employeeName: "木村 莉子", message: "社員相談AIが要フォローを検知。1on1を推奨", at: "2026-06-04T18:10:00+09:00", aiHandled: true },
+  { id: "AC-04", stage: "learning", employeeName: "松本 結衣", message: "ハラスメント防止研修を修了しました", at: "2026-06-04T17:30:00+09:00", aiHandled: false },
+  { id: "AC-03", stage: "recruit", employeeName: "鈴木 彩花", message: "AI面接の結果、内定ステータスに更新", at: "2026-06-04T11:00:00+09:00", aiHandled: true },
+  { id: "AC-02", stage: "hr", employeeName: "松本 結衣", message: "総務AIが通勤手当の申請方法を案内しました", at: "2026-06-05T08:50:00+09:00", aiHandled: true },
+  { id: "AC-01", stage: "onboarding", employeeName: "中村 拓也", message: "雇用契約に電子署名が完了しました", at: "2026-06-02T10:31:00+09:00", aiHandled: false },
+];
+
+// ============================================================
+// ダッシュボード集計（実データから算出 + 一部固定）
+// ============================================================
+export const dashboardStats: DashboardStats = {
+  applicants: applicants.filter((a) => ["applied", "screening", "interview"].includes(a.status)).length,
+  offers: applicants.filter((a) => a.status === "offer").length,
+  onboarding: new Set(
+    contracts.filter((c) => c.status !== "completed").map((c) => c.employeeName)
+  ).size,
+  learningInProgress: enrollments.filter((e) => e.status === "inProgress").length,
+  openHrTasks: hrTasks.filter((t) => t.status !== "done").length,
+  retentionRisk: consultations.filter((c) => c.mood === "risk").length,
+  employees: 128,
+  aiHandledToday: 34,
+};
+
+// 導入効果（PDF掲載の参考値）
+export const impactStats = [
+  { label: "業務時間削減", value: "約40", unit: "%" },
+  { label: "採用工数削減", value: "約50", unit: "%" },
+  { label: "社員満足度向上", value: "約30", unit: "%" },
+];
