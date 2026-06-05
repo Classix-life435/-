@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - claude/vigilant-edison-8UFgS
+      - claude/keen-einstein-xialt
       - main
   workflow_dispatch:
 
