@@ -82,8 +82,13 @@
       encodeURIComponent(text) + "&url=" + encodeURIComponent(url);
     el.shareX.setAttribute("href", xHref);
 
-    // Instagram: Webからフィード直接投稿はできないため、アカウントへ誘導
-    el.shareIg.setAttribute("href", cfg.instagramUrl || "#");
+    // Instagram: Webから直接投稿できないため、カード画像を保存してInstagramを開く
+    el.shareIg.onclick = function (e) {
+      e.preventDefault();
+      downloadCard(z);
+      window.open(cfg.instagramUrl || "https://www.instagram.com/", "_blank", "noopener");
+      showToast("画像を保存しました。Instagramに貼り付けて投稿してね");
+    };
 
     // リンクコピー
     el.shareCopy.onclick = function () {
@@ -95,11 +100,27 @@
     el.lineAdd.setAttribute("href", cfg.lineAddUrl || "#");
   }
 
+  /* ---------- カード画像を端末に保存 ---------- */
+  function downloadCard(z) {
+    const a = document.createElement("a");
+    a.href = "assets/zodiac/" + z.slug + ".png";
+    a.download = z.jp + "_" + z.en + ".png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  /* ---------- トースト表示 ---------- */
+  let toastTimer = null;
+  function showToast(msg) {
+    el.copiedToast.textContent = msg;
+    el.copiedToast.hidden = false;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.copiedToast.hidden = true; }, 2600);
+  }
+
   function copyToClipboard(value) {
-    const done = () => {
-      el.copiedToast.hidden = false;
-      setTimeout(() => { el.copiedToast.hidden = true; }, 2000);
-    };
+    const done = () => showToast("リンクをコピーしました");
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(value).then(done).catch(() => fallbackCopy(value, done));
     } else {

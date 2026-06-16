@@ -11,15 +11,16 @@ window.APP_CONFIG = {
      未設定（""）の場合は、開いているページのURLを自動で使います。 */
   shareBaseUrl: "",
 
-  /* LINE 公式アカウントの「友だち追加」URL
-     例: "https://lin.ee/xxxxxxx" や "https://line.me/R/ti/p/@xxxxxxx" */
-  lineAddUrl: "https://lin.ee/your-line-id",
+  /* LINE 登録（ログイン）URL */
+  lineAddUrl: "https://mademoiselle-ai.com/login",
 
-  /* X（旧Twitter）アカウントのURL（プロフィールへのリンク用） */
-  xAccountUrl: "https://x.com/your_account",
+  /* X（旧Twitter）: ボタンを押すと、利用者自身が投稿できる投稿画面を開きます。
+     （アカウントへのリンクではなく投稿用なので、設定は不要です） */
 
-  /* Instagram アカウントのURL */
-  instagramUrl: "https://www.instagram.com/your_account/",
+  /* Instagram: ボタンを押すと結果カード画像を保存し、Instagramを開きます。
+     利用者はその画像をストーリー/フィードに貼り付けて投稿できます。
+     開き先を変えたい場合のみURLを変更してください。 */
+  instagramUrl: "https://www.instagram.com/",
 
   /* シェアするときの文言（{sign} は星座名に置き換わります） */
   shareText: "私の星座は「{sign}」でした✨ あなたの星座も占ってみてね🌙",
