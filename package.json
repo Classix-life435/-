@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "fortune:hash": "node scripts/gen-fortune-hash.mjs",
+    "fortune:verify": "node scripts/verify-fortune.mjs"
   },
   "dependencies": {
     "next": "14.2.5",

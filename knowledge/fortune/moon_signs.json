@@ -1,0 +1,101 @@
+{
+  "_note": "月の12星座キーワード（欠けやすいもの）。原文から抽出のみ。missingKeyword/description/oppositeAdvice は原文受領後に記入。",
+  "signs": {
+    "aries": {
+      "sign": "aries",
+      "labelJa": "牡羊座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "libra",
+      "oppositeAdvice": ""
+    },
+    "taurus": {
+      "sign": "taurus",
+      "labelJa": "牡牛座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "scorpio",
+      "oppositeAdvice": ""
+    },
+    "gemini": {
+      "sign": "gemini",
+      "labelJa": "双子座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "sagittarius",
+      "oppositeAdvice": ""
+    },
+    "cancer": {
+      "sign": "cancer",
+      "labelJa": "蟹座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "capricorn",
+      "oppositeAdvice": ""
+    },
+    "leo": {
+      "sign": "leo",
+      "labelJa": "獅子座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "aquarius",
+      "oppositeAdvice": ""
+    },
+    "virgo": {
+      "sign": "virgo",
+      "labelJa": "乙女座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "pisces",
+      "oppositeAdvice": ""
+    },
+    "libra": {
+      "sign": "libra",
+      "labelJa": "天秤座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "aries",
+      "oppositeAdvice": ""
+    },
+    "scorpio": {
+      "sign": "scorpio",
+      "labelJa": "蠍座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "taurus",
+      "oppositeAdvice": ""
+    },
+    "sagittarius": {
+      "sign": "sagittarius",
+      "labelJa": "射手座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "gemini",
+      "oppositeAdvice": ""
+    },
+    "capricorn": {
+      "sign": "capricorn",
+      "labelJa": "山羊座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "cancer",
+      "oppositeAdvice": ""
+    },
+    "aquarius": {
+      "sign": "aquarius",
+      "labelJa": "水瓶座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "leo",
+      "oppositeAdvice": ""
+    },
+    "pisces": {
+      "sign": "pisces",
+      "labelJa": "魚座",
+      "missingKeyword": "",
+      "description": "",
+      "oppositeSign": "virgo",
+      "oppositeAdvice": ""
+    }
+  }
+}

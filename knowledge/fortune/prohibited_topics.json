@@ -1,0 +1,23 @@
+{
+  "_note": "占いの禁止事項（AI鑑定のガードレール）。原文から抽出のみ。",
+  "lifeAndDeath": {
+    "labelJa": "寿命・死期",
+    "rules": []
+  },
+  "medical": {
+    "labelJa": "病気・医療",
+    "rules": []
+  },
+  "investmentGambling": {
+    "labelJa": "投資・ギャンブル",
+    "rules": []
+  },
+  "fearBasedStatements": {
+    "labelJa": "不安を煽る断定",
+    "rules": []
+  },
+  "difficultPeriodWording": {
+    "labelJa": "困難な時期の表現",
+    "rules": []
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "_note": "太陽の12星座（向かうべき本物の方向）。原文から抽出のみ。labelJa以外の解釈は原文受領後に記入。",
+  "signs": {
+    "aries": {
+      "sign": "aries",
+      "labelJa": "牡羊座",
+      "trueDirection": ""
+    },
+    "taurus": {
+      "sign": "taurus",
+      "labelJa": "牡牛座",
+      "trueDirection": ""
+    },
+    "gemini": {
+      "sign": "gemini",
+      "labelJa": "双子座",
+      "trueDirection": ""
+    },
+    "cancer": {
+      "sign": "cancer",
+      "labelJa": "蟹座",
+      "trueDirection": ""
+    },
+    "leo": {
+      "sign": "leo",
+      "labelJa": "獅子座",
+      "trueDirection": ""
+    },
+    "virgo": {
+      "sign": "virgo",
+      "labelJa": "乙女座",
+      "trueDirection": ""
+    },
+    "libra": {
+      "sign": "libra",
+      "labelJa": "天秤座",
+      "trueDirection": ""
+    },
+    "scorpio": {
+      "sign": "scorpio",
+      "labelJa": "蠍座",
+      "trueDirection": ""
+    },
+    "sagittarius": {
+      "sign": "sagittarius",
+      "labelJa": "射手座",
+      "trueDirection": ""
+    },
+    "capricorn": {
+      "sign": "capricorn",
+      "labelJa": "山羊座",
+      "trueDirection": ""
+    },
+    "aquarius": {
+      "sign": "aquarius",
+      "labelJa": "水瓶座",
+      "trueDirection": ""
+    },
+    "pisces": {
+      "sign": "pisces",
+      "labelJa": "魚座",
+      "trueDirection": ""
+    }
+  }
+}

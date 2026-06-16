@@ -1,0 +1,65 @@
+{
+  "_note": "月星座別・刺激しないほうがいいこと。原文にある項目を漏らさず triggers に入れる（原文受領後）。",
+  "signs": {
+    "aries": {
+      "sign": "aries",
+      "labelJa": "牡羊座",
+      "triggers": []
+    },
+    "taurus": {
+      "sign": "taurus",
+      "labelJa": "牡牛座",
+      "triggers": []
+    },
+    "gemini": {
+      "sign": "gemini",
+      "labelJa": "双子座",
+      "triggers": []
+    },
+    "cancer": {
+      "sign": "cancer",
+      "labelJa": "蟹座",
+      "triggers": []
+    },
+    "leo": {
+      "sign": "leo",
+      "labelJa": "獅子座",
+      "triggers": []
+    },
+    "virgo": {
+      "sign": "virgo",
+      "labelJa": "乙女座",
+      "triggers": []
+    },
+    "libra": {
+      "sign": "libra",
+      "labelJa": "天秤座",
+      "triggers": []
+    },
+    "scorpio": {
+      "sign": "scorpio",
+      "labelJa": "蠍座",
+      "triggers": []
+    },
+    "sagittarius": {
+      "sign": "sagittarius",
+      "labelJa": "射手座",
+      "triggers": []
+    },
+    "capricorn": {
+      "sign": "capricorn",
+      "labelJa": "山羊座",
+      "triggers": []
+    },
+    "aquarius": {
+      "sign": "aquarius",
+      "labelJa": "水瓶座",
+      "triggers": []
+    },
+    "pisces": {
+      "sign": "pisces",
+      "labelJa": "魚座",
+      "triggers": []
+    }
+  }
+}
