@@ -3,19 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>12星座 占い｜あなたの星座カード</title>
+  <!-- リファラを送りすぎない（外部リンク先に閲覧元の詳細を渡さない） -->
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>ただの星座占い</title>
   <meta name="description" content="お誕生日を入れるだけで、あなたの星座カードを1枚お届けします。" />
 
   <!-- OGP（SNSシェア時の見え方） -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="12星座 占い｜あなたの星座カード" />
+  <meta property="og:title" content="ただの星座占い" />
   <meta property="og:description" content="お誕生日を入れるだけで、あなたの星座カードを1枚お届けします。" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Cormorant+Garamond:ital@0;1&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=2" />
+  <link rel="stylesheet" href="css/style.css?v=3" />
 </head>
 <body>
   <div class="stars" aria-hidden="true"></div>
@@ -25,7 +27,7 @@
     <section id="screen-input" class="screen is-active">
       <header class="hero">
         <p class="hero__moon">🌙</p>
-        <h1 class="hero__title">12星座 占い</h1>
+        <h1 class="hero__title">ただの星座占い</h1>
         <p class="hero__sub">あなたの星座カードを、1枚お届けします。</p>
       </header>
 
@@ -96,11 +98,12 @@
   </main>
 
   <footer class="footer">
-    <small>© 2026 12星座 占い</small>
+    <p class="footer__privacy">入力したお誕生日は、この端末（ブラウザ）の中だけで星座の判定に使われ、サーバーには送信・保存されません。</p>
+    <small>© 2026 ただの星座占い</small>
   </footer>
 
-  <script src="js/config.js?v=2"></script>
-  <script src="js/zodiac-data.js?v=2"></script>
-  <script src="js/app.js?v=2"></script>
+  <script src="js/config.js?v=3"></script>
+  <script src="js/zodiac-data.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>

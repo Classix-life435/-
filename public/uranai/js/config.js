@@ -26,7 +26,7 @@ window.APP_CONFIG = {
   shareText: "私の星座は「{sign}」でした✨ あなたの星座も占ってみてね🌙",
 
   /* 「一人に一度だけ」の制限。
-     false = 何度でも占える（テスト中・本番前はこちら）
-     true  = お一人さま一度だけ（本番運用時にこちらへ戻す） */
-  oncePerPerson: false,
+     true  = お一人さま一度だけ（本番・公開時はこちら）
+     false = 何度でも占える（テスト用） */
+  oncePerPerson: true,
 };
