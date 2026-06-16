@@ -1,0 +1,205 @@
+/* =====================================================================
+ *  12星座 占い  スタイル
+ * ===================================================================== */
+:root {
+  --bg-0: #0b1030;
+  --bg-1: #1a2150;
+  --gold: #e8d6a3;
+  --gold-soft: #f4eccf;
+  --ink: #f3f1ff;
+  --ink-dim: #c5c2e6;
+  --panel: rgba(28, 33, 78, 0.62);
+  --panel-border: rgba(232, 214, 163, 0.35);
+  --line-green: #06c755;
+  --x-bg: #000;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --radius: 22px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  font-family: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+  color: var(--ink);
+  background: radial-gradient(120% 120% at 50% 0%, #232a63 0%, var(--bg-1) 38%, var(--bg-0) 100%);
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ----- 星のきらめき ----- */
+.stars {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 75% 15%, #fff, transparent),
+    radial-gradient(1px 1px at 50% 60%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 85% 70%, #fff, transparent),
+    radial-gradient(1px 1px at 10% 80%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 35% 90%, #fff, transparent),
+    radial-gradient(1px 1px at 60% 35%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 45%, #fff, transparent);
+  opacity: 0.55;
+  animation: twinkle 5s ease-in-out infinite alternate;
+}
+@keyframes twinkle { from { opacity: 0.35; } to { opacity: 0.7; } }
+
+/* ----- レイアウト ----- */
+.app {
+  position: relative; z-index: 1;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 32px 20px 12px;
+  flex: 1;
+}
+
+.screen { display: none; animation: fade-up 0.6s ease both; }
+.screen.is-active { display: block; }
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ----- ヒーロー ----- */
+.hero { text-align: center; margin-bottom: 26px; }
+.hero__moon { font-size: 34px; margin: 0 0 4px; }
+.hero__title {
+  font-size: 34px; letter-spacing: 0.12em; margin: 0;
+  color: var(--gold-soft);
+  text-shadow: 0 0 18px rgba(232, 214, 163, 0.4);
+}
+.hero__sub { margin: 10px 0 0; color: var(--ink-dim); font-size: 14px; letter-spacing: 0.04em; }
+
+/* ----- パネル ----- */
+.card-panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+}
+
+.field-label {
+  display: block; text-align: center; font-size: 15px;
+  margin-bottom: 16px; color: var(--gold-soft); letter-spacing: 0.06em;
+}
+.date-row { display: flex; justify-content: center; }
+
+input[type="date"] {
+  width: 100%; max-width: 280px;
+  font-family: inherit; font-size: 17px;
+  padding: 13px 16px;
+  color: var(--ink);
+  background: rgba(11, 16, 48, 0.6);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  text-align: center;
+}
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.85); cursor: pointer; }
+input[type="date"]:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(232, 214, 163, 0.18); }
+
+.form-error { color: #ffb3c1; text-align: center; font-size: 13px; margin: 12px 0 0; }
+
+/* ----- ボタン ----- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; margin-top: 22px;
+  font-family: inherit; font-size: 17px; letter-spacing: 0.12em;
+  padding: 15px 20px; border: none; border-radius: 999px;
+  cursor: pointer; text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+.btn:active { transform: scale(0.98); }
+
+.btn--primary {
+  color: #2a1f3a;
+  background: linear-gradient(135deg, #f6e7b4, #e8c87f 60%, #d8ad5a);
+  box-shadow: 0 10px 28px rgba(216, 173, 90, 0.4);
+  font-weight: 700;
+}
+.btn--primary:hover { box-shadow: 0 14px 34px rgba(216, 173, 90, 0.55); }
+
+.btn--ghost {
+  color: var(--gold-soft); background: transparent;
+  border: 1px solid var(--panel-border);
+}
+
+.btn--line {
+  color: #fff; background: var(--line-green);
+  box-shadow: 0 10px 26px rgba(6, 199, 85, 0.4);
+  font-weight: 700;
+}
+.btn--line:hover { box-shadow: 0 14px 32px rgba(6, 199, 85, 0.55); }
+.line-icon { width: 24px; height: 24px; }
+
+.note { text-align: center; font-size: 12px; color: var(--ink-dim); margin: 14px 0 0; }
+
+/* ----- 結果画面 ----- */
+.result-stage { text-align: center; }
+.result-lead { color: var(--gold-soft); letter-spacing: 0.1em; font-size: 15px; margin: 0 0 14px; }
+
+.result-card {
+  margin: 0 auto;
+  width: 100%; max-width: 360px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow), 0 0 40px rgba(232, 214, 163, 0.25);
+  animation: card-reveal 0.9s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes card-reveal {
+  0%   { opacity: 0; transform: translateY(24px) scale(0.92) rotateZ(-2deg); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotateZ(0); }
+}
+.result-card__img { display: block; width: 100%; height: auto; }
+
+.result-name {
+  margin: 22px 0 6px; font-size: 28px; letter-spacing: 0.1em;
+  color: var(--gold-soft);
+}
+.result-name small { display: block; font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 16px; color: var(--gold); letter-spacing: 0.18em; margin-top: 2px; }
+.result-catch { color: var(--ink-dim); font-size: 14px; margin: 0 0 26px; letter-spacing: 0.04em; }
+
+/* ----- シェア ----- */
+.share { text-align: center; margin-bottom: 26px; }
+.share__label { font-size: 13px; color: var(--ink-dim); letter-spacing: 0.1em; margin: 0 0 12px; }
+.share__btns { display: flex; justify-content: center; gap: 16px; }
+
+.sns {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer; text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+.sns:hover { transform: translateY(-3px); }
+.sns svg { width: 24px; height: 24px; fill: #fff; }
+.sns--x { background: var(--x-bg); }
+.sns--ig { background: linear-gradient(45deg, #feda75, #fa7e1e 30%, #d62976 55%, #962fbf 75%, #4f5bd5); }
+.sns--copy { background: rgba(255, 255, 255, 0.14); border: 1px solid var(--panel-border); }
+.share__copied { color: var(--gold-soft); font-size: 12px; margin: 12px 0 0; }
+
+/* ----- LINE CTA ----- */
+.line-cta { text-align: center; }
+.line-cta__note { font-size: 12px; color: var(--ink-dim); margin: 12px 0 0; }
+
+/* ----- 利用済み画面 ----- */
+.used-panel { text-align: center; }
+.used-title { color: var(--gold-soft); font-size: 22px; margin: 8px 0 14px; letter-spacing: 0.06em; }
+.used-text { color: var(--ink-dim); font-size: 14px; line-height: 1.8; margin: 0 0 18px; }
+
+/* ----- フッター ----- */
+.footer { position: relative; z-index: 1; text-align: center; padding: 18px 0 24px; color: var(--ink-dim); opacity: 0.7; }
+
+@media (max-width: 380px) {
+  .hero__title { font-size: 28px; }
+  .result-name { font-size: 24px; }
+}
