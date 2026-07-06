@@ -64,9 +64,8 @@ async function generateWithClaude(input: GenerateInput): Promise<Script> {
   const response = await client.messages.create({
     model: MODEL,
     max_tokens: 8000,
-    // Opus 4.8 では adaptive thinking を推奨。SDK の型が対応したら以下を有効化:
-    //   thinking: { type: 'adaptive' },
-    // （budget_tokens は Opus 4.8 で 400 になるため使わない）
+    // Opus 4.8 では adaptive thinking を使用（budget_tokens は 400 になるため不可）
+    thinking: { type: 'adaptive' },
     system,
     messages: [{ role: 'user', content: user }],
   });
