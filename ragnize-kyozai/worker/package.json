@@ -1,0 +1,14 @@
+{
+  "name": "ragnize-render-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "RAGNIZE 教材ジェネレーター 動画合成ワーカー（スライド＋ナレーション → MP4）",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "playwright": "^1.47.0"
+  }
+}

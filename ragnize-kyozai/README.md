@@ -29,8 +29,16 @@ Supabase を使う場合は `supabase/schema.sql` を実行してテーブルを
 
 ## デプロイ
 
-- Vercel を推奨（Next.js App Router）。環境変数をVercelに設定してデプロイ。
-- 動画合成は時間がかかるため、本番では `generation_jobs` を使って**キュー＋ワーカー**に分離することを推奨（Vercelの関数タイムアウト対策）。
+- Vercel を推奨（Next.js App Router）。
+- **重要**: このアプリはリポジトリ直下ではなく `ragnize-kyozai/` にあるため、Vercel の
+  **Project Settings → Root Directory を `ragnize-kyozai`** に設定してください。
+- 環境変数（`.env.example` の各キー）を Vercel に登録してデプロイ。
+- `vercel.json` で `/api/generate` の `maxDuration` を 300 秒に設定しています
+  （**Pro プラン以上が必要**。Hobby では 60 秒に制限されます）。
+- 動画合成は時間がかかるため、本番では `generation_jobs` を使って**キュー＋ワーカー**に
+  分離することを推奨（Vercelの関数タイムアウト対策）。動画合成ワーカーは `worker/` を
+  別サービス（Chromium＋ffmpeg入りのコンテナ等）としてデプロイし、`RENDER_WORKER_URL` に
+  そのURLを設定します（詳細は `worker/README.md`）。
 
 ## 動画の保護（Vimeo）
 
@@ -55,6 +63,8 @@ lib/
   vimeo.ts     Vimeoアップロード（限定公開）
   supabase.ts  LMS DB（プログラム取得・レッスン登録）
 supabase/schema.sql        DBスキーマ＋初期データ
+worker/                    動画合成ワーカー（別デプロイ / Playwright＋ffmpeg）
+vercel.json                Vercel 関数設定（generate の maxDuration）
 ```
 
 ## 次のステップ
