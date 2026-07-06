@@ -11,6 +11,7 @@
 |---|---|---|
 | 台本・構成生成 | ✅ Claude API（未設定時はローカル生成） | `ANTHROPIC_API_KEY` |
 | スライド生成 | 🔌 Canva Connect API（Autofill） | `CANVA_CONNECT_TOKEN` / `CANVA_BRAND_TEMPLATE_ID` |
+| PowerPoint出力 | ✅ pptxgenjs（キー不要・サーバー生成） | 不要 |
 | 解説音声(TTS) | 🔌 OpenAI音声（他社に差し替え可） | `OPENAI_API_KEY` |
 | 動画合成 | 🔌 レンダーワーカーに委譲（Remotion/ffmpeg） | `RENDER_WORKER_URL` |
 | Vimeoアップロード | ✅ Vimeo API（pull方式・限定公開） | `VIMEO_ACCESS_TOKEN` |
@@ -42,10 +43,12 @@ app/
   page.tsx                 入口（プログラム一覧を取得してUI表示）
   api/generate/route.ts    生成パイプライン実行
   api/publish/route.ts     LMSへ排出（下書き登録）
-components/Generator.tsx    生成UI（入力→進捗→プレビュー→排出）
+  api/pptx/route.ts        台本→PowerPoint(.pptx) ダウンロード
+components/Generator.tsx    生成UI（入力→進捗→プレビュー→排出→PPTX出力）
 lib/
   pipeline.ts  台本→スライド→音声→動画→Vimeo のオーケストレーション
   llm.ts       台本・構成生成（Claude / ローカル）
+  pptx.ts      台本→PowerPoint 生成（pptxgenjs・キー不要）
   slides.ts    Canva Connect（Autofill）
   tts.ts       解説音声（OpenAI音声 ほか）
   video.ts     動画合成ワーカー呼び出し

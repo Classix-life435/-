@@ -28,6 +28,9 @@ export default function Generator({ programs }: { programs: Program[] }) {
   const [publishing, setPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
 
+  // PowerPoint ダウンロード用の状態
+  const [downloadingPptx, setDownloadingPptx] = useState(false);
+
   function update<K extends keyof GenerateInput>(key: K, value: GenerateInput[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
@@ -86,6 +89,35 @@ export default function Generator({ programs }: { programs: Program[] }) {
       setPublishResult({ status: 'error', live: true, detail: err?.message ?? String(err) });
     } finally {
       setPublishing(false);
+    }
+  }
+
+  async function onDownloadPptx() {
+    if (!result) return;
+    setDownloadingPptx(true);
+    try {
+      const res = await fetch('/api/pptx', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(result.script),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'PPTX生成に失敗しました');
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(result.script.title || 'kyozai').replace(/[\\/:*?"<>|]/g, '_')}.pptx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      setError(err?.message ?? String(err));
+    } finally {
+      setDownloadingPptx(false);
     }
   }
 
@@ -158,6 +190,18 @@ export default function Generator({ programs }: { programs: Program[] }) {
       {/* 結果 */}
       {result && (
         <div className="panel">
+          <div className="result-actions">
+            <button
+              onClick={onDownloadPptx}
+              disabled={downloadingPptx}
+              className="secondary"
+            >
+              {downloadingPptx ? 'PowerPoint生成中…' : '📊 PowerPointをダウンロード（.pptx）'}
+            </button>
+            <span className="muted">
+              台本からスライドを生成（Canva 未接続でも利用可）。ナレーションはスピーカーノートに入ります。
+            </span>
+          </div>
           <div className="tabs">
             <div
               className={`tab ${tab === 'preview' ? 'active' : ''}`}

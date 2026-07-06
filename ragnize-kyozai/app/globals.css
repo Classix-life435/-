@@ -114,6 +114,18 @@ button.secondary {
   color: var(--text);
 }
 
+.result-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.result-actions button {
+  margin-top: 0;
+}
+
 .tabs {
   display: flex;
   gap: 8px;
