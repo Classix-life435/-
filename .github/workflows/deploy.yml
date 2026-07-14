@@ -5,6 +5,7 @@ on:
     branches:
       - claude/vigilant-edison-8UFgS
       - claude/keen-einstein-xialt
+      - claude/qr-phone-recruiter-dashboard-x65lx1
       - main
   workflow_dispatch:
 
