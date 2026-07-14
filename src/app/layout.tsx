@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
 
+// ルートレイアウトは html/body のみを担当する薄い層。
+// 各プロダクト（VoxaLink Workforce / QR Phone 面接）は
+// それぞれのルートグループで独自のシェル（レイアウト）を持つ。
 export const metadata: Metadata = {
   title: "VoxaLink Workforce｜人財DXプラットフォーム",
   description:
@@ -16,17 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>
-        <div className="flex h-screen overflow-hidden">
-          <Sidebar />
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <Header />
-            <main className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
-              <div className="mx-auto max-w-7xl">{children}</div>
-            </main>
-          </div>
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
