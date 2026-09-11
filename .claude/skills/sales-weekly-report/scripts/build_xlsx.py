@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""営業案件JSON -> Excel（案件一覧 + サマリ）
+"""営業案件・リードJSON -> Excel（サマリ + 案件一覧 + リード一覧）
 
 使い方:
     python3 build_xlsx.py deals.json 営業進捗_20260911.xlsx
 
-入力JSONの形（詳細は SKILL.md「案件JSONの形」を参照）:
+入力JSONの形（詳細は SKILL.md「案件JSONの形」「リードJSONの形」を参照）:
 {
   "period": {"start": "2026-09-04 15:00", "end": "2026-09-11 15:00"},
   "generated_at": "2026-09-11 15:00",
-  "deals": [ {...}, ... ]
+  "deals": [ {...}, ... ],
+  "leads": [ {...}, ... ]      // 省略可。無ければリードシートを作らない
 }
 
 金額が不明な案件は amount_yen を null にする。0 と null は意味が違う
-（0 は「無償」、null は「Slackに書かれていない」）ので、ここでは区別して扱う。
+（0 は「無償」、null は「どこにも書かれていない」）ので、ここでは区別して扱う。
 """
 
 import json
@@ -41,11 +42,32 @@ COLUMNS = [
 
 PHASE_ORDER = ["リード", "初回接触", "提案", "見積", "交渉", "受注", "失注", "保留"]
 
+# リード一覧の列定義: (見出し, JSONキー, 幅, 折り返すか)
+LEAD_COLUMNS = [
+    ("受信日", "received", 12, False),
+    ("会社名", "company", 24, False),
+    ("担当者", "person", 14, False),
+    ("メール", "email", 26, False),
+    ("製品", "product", 16, False),
+    ("ステージ", "stage", 11, False),
+    ("要返信", "awaiting_label", 8, False),
+    ("問い合わせ内容", "summary", 46, True),
+    ("次のアクション", "next_action", 30, True),
+    ("期日", "due", 12, False),
+    ("担当", "owner", 12, False),
+    ("返信下書き", "reply_draft", 12, False),
+    ("出典", "source", 34, True),
+]
+
+# Gmailラベル「リード/NN-xxx」と同じ順番・同じ語彙。ラベルが正、この表はその写し。
+STAGE_ORDER = ["未対応", "返信済", "商談化", "クローズ", "対象外"]
+
 HEADER_FILL = PatternFill("solid", fgColor="1F3864")
 HEADER_FONT = Font(color="FFFFFF", bold=True, size=11)
-ALERT_FILL = PatternFill("solid", fgColor="FCE4E4")   # 期日超過・失注
-WARN_FILL = PatternFill("solid", fgColor="FFF3CD")    # 期日が3日以内
-WON_FILL = PatternFill("solid", fgColor="E5F3E5")     # 受注
+ALERT_FILL = PatternFill("solid", fgColor="FCE4E4")   # 期日超過・失注・放置リード
+WARN_FILL = PatternFill("solid", fgColor="FFF3CD")    # 期日が3日以内・未対応
+WON_FILL = PatternFill("solid", fgColor="E5F3E5")     # 受注・商談化
+MUTED_FILL = PatternFill("solid", fgColor="F0F0F0")   # クローズ・対象外
 THIN = Side(style="thin", color="D9D9D9")
 BORDER = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
 
@@ -81,6 +103,65 @@ def row_fill(deal, today):
         if remaining <= 3:
             return WARN_FILL
     return None
+
+
+def lead_row_fill(lead, today):
+    """リード行の背景色。返事を待たせている相手を目立たせるのが狙い。
+
+    ステージより awaiting_reply を優先する。商談化まで進んだ相手でも、
+    こちらが返事を止めている状態が一番失注に近いため。
+    問い合わせは鮮度が命なので、3日を過ぎた未返信は赤にする。
+    """
+    stage = (lead.get("stage") or "").strip()
+    if stage in ("クローズ", "対象外"):
+        return MUTED_FILL
+
+    if lead.get("awaiting_reply"):
+        received = parse_due(lead.get("received"))
+        if received and (today - received).days > 3:
+            return ALERT_FILL
+        return WARN_FILL
+
+    due = parse_due(lead.get("due"))
+    if due and (due - today).days < 0:
+        return ALERT_FILL
+    if stage == "商談化":
+        return WON_FILL
+    if stage == "未対応":
+        return WARN_FILL
+    return None
+
+
+def write_leads_sheet(ws, leads, today):
+    ws.freeze_panes = "A2"
+    for col_index, (header, _key, width, _wrap) in enumerate(LEAD_COLUMNS, start=1):
+        cell = ws.cell(row=1, column=col_index, value=header)
+        cell.fill = HEADER_FILL
+        cell.font = HEADER_FONT
+        cell.alignment = Alignment(vertical="center", horizontal="center")
+        cell.border = BORDER
+        ws.column_dimensions[get_column_letter(col_index)].width = width
+    ws.row_dimensions[1].height = 24
+
+    for offset, lead in enumerate(leads):
+        row = offset + 2
+        fill = lead_row_fill(lead, today)
+        for col_index, (_header, key, _width, wrap) in enumerate(LEAD_COLUMNS, start=1):
+            if key == "awaiting_label":
+                value = "要返信" if lead.get("awaiting_reply") else None
+            else:
+                value = lead.get(key)
+            if value == "":
+                value = None
+            cell = ws.cell(row=row, column=col_index, value=value)
+            cell.border = BORDER
+            cell.alignment = Alignment(vertical="top", wrap_text=wrap)
+            if fill:
+                cell.fill = fill
+        ws.row_dimensions[row].height = 34
+
+    last_row = max(len(leads) + 1, 2)
+    ws.auto_filter.ref = f"A1:{get_column_letter(len(LEAD_COLUMNS))}{last_row}"
 
 
 def write_deals_sheet(ws, deals, today):
@@ -125,7 +206,48 @@ def write_deals_sheet(ws, deals, today):
     ws.auto_filter.ref = f"A1:{get_column_letter(len(COLUMNS))}{last_row}"
 
 
-def write_summary_sheet(ws, deals, period, generated_at):
+def write_lead_summary(ws, leads, start_row):
+    """サマリシートの下段にリードの内訳を足す。行番号を返す。"""
+    ws.cell(row=start_row, column=1, value="リード内訳").font = Font(bold=True, size=12)
+
+    header_row = start_row + 1
+    for col_index, header in enumerate(["ステージ", "件数", "製品", "件数"], start=1):
+        cell = ws.cell(row=header_row, column=col_index, value=header)
+        cell.fill = HEADER_FILL
+        cell.font = HEADER_FONT
+        cell.alignment = Alignment(horizontal="center")
+        cell.border = BORDER
+
+    stages = [s for s in STAGE_ORDER if any((l.get("stage") or "").strip() == s for l in leads)]
+    for lead in leads:
+        stage = (lead.get("stage") or "未分類").strip()
+        if stage not in stages:
+            stages.append(stage)
+
+    products = []
+    for lead in leads:
+        product = (lead.get("product") or "未分類").strip()
+        if product not in products:
+            products.append(product)
+
+    # ステージと製品は件数が違うので、行数の多い方に合わせて左右に並べる。
+    row = header_row + 1
+    for index in range(max(len(stages), len(products))):
+        if index < len(stages):
+            stage = stages[index]
+            ws.cell(row=row, column=1, value=stage).border = BORDER
+            ws.cell(row=row, column=2,
+                    value=len([l for l in leads if (l.get("stage") or "未分類").strip() == stage])).border = BORDER
+        if index < len(products):
+            product = products[index]
+            ws.cell(row=row, column=3, value=product).border = BORDER
+            ws.cell(row=row, column=4,
+                    value=len([l for l in leads if (l.get("product") or "未分類").strip() == product])).border = BORDER
+        row += 1
+    return row
+
+
+def write_summary_sheet(ws, deals, period, generated_at, leads=None):
     ws.column_dimensions["A"].width = 18
     for letter in "BCD":
         ws.column_dimensions[letter].width = 16
@@ -138,6 +260,9 @@ def write_summary_sheet(ws, deals, period, generated_at):
     ws["B3"] = generated_at
     ws["A4"] = "案件数"
     ws["B4"] = len(deals)
+    if leads:
+        ws["C4"] = "リード数"
+        ws["D4"] = len(leads)
 
     header_row = 6
     for col_index, header in enumerate(["フェーズ", "件数", "金額合計(円)", "加重金額(円)"], start=1):
@@ -190,8 +315,13 @@ def write_summary_sheet(ws, deals, period, generated_at):
             cell.number_format = '¥#,##0;;"-"'
 
     note_row = row + 2
-    ws.cell(row=note_row, column=1, value="※ 金額・確度はSlackに明記があったものだけを集計しています（空欄＝未記載）。")
+    ws.cell(row=note_row, column=1, value="※ 金額・確度はSlackやメールに明記があったものだけを集計しています（空欄＝未記載）。")
     ws.cell(row=note_row + 1, column=1, value="※ 加重金額 = 金額 × 受注確度。両方が埋まっている案件のみ。")
+
+    if leads:
+        ws.cell(row=note_row + 3, column=1,
+                value="※ リードのステージはGmailラベル「リード/…」が正。この表はその時点の写しです。")
+        write_lead_summary(ws, leads, note_row + 5)
 
 
 def main():
@@ -203,6 +333,7 @@ def main():
         data = json.load(handle)
 
     deals = data.get("deals", [])
+    leads = data.get("leads", [])
     period = data.get("period", {})
     generated_at = data.get("generated_at", datetime.now().strftime("%Y-%m-%d %H:%M"))
 
@@ -216,16 +347,29 @@ def main():
 
     deals = sorted(deals, key=sort_key)
 
+    # こちらが返事を止めているものを最上段に、次にステージ順。
+    # 同じ区分の中では古い問い合わせほど危ないので受信日の昇順。
+    def lead_sort_key(lead):
+        stage = (lead.get("stage") or "").strip()
+        rank = STAGE_ORDER.index(stage) if stage in STAGE_ORDER else len(STAGE_ORDER)
+        awaiting = 0 if lead.get("awaiting_reply") and stage not in ("クローズ", "対象外") else 1
+        received = parse_due(lead.get("received"))
+        return (awaiting, rank, received or date.max)
+
+    leads = sorted(leads, key=lead_sort_key)
+
+    today = date.today()
     workbook = Workbook()
     summary = workbook.active
     summary.title = "サマリ"
-    detail = workbook.create_sheet("案件一覧")
 
-    write_summary_sheet(summary, deals, period, generated_at)
-    write_deals_sheet(detail, deals, date.today())
+    write_summary_sheet(summary, deals, period, generated_at, leads)
+    write_deals_sheet(workbook.create_sheet("案件一覧"), deals, today)
+    if leads:
+        write_leads_sheet(workbook.create_sheet("リード一覧"), leads, today)
 
     workbook.save(sys.argv[2])
-    print(f"wrote {sys.argv[2]} ({len(deals)} deals)")
+    print(f"wrote {sys.argv[2]} ({len(deals)} deals, {len(leads)} leads)")
     return 0
 
 
